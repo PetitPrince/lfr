@@ -8,7 +8,7 @@ urlpatterns = [
     path("accounts/", include("accounts.urls")),
     path("runs/", include("runs.urls")),
     path("posts/", include("posts.urls")),
-    path("invites/", include("invites.urls")),
+    path("casting/", include("casting.urls")),
 ]
 
 if settings.DEBUG:

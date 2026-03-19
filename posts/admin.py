@@ -27,14 +27,14 @@ class PhotoInline(admin.TabularInline):
 class PostAdmin(admin.ModelAdmin):
     list_display = ["__str__", "post_type", "run", "author", "is_published", "created_at"]
     list_filter = ["run", "post_type", "is_published"]
-    search_fields = ["character_name", "title", "description"]
+    search_fields = ["title", "content"]
     raw_id_fields = ["author", "casting"]
     inlines = [PostKeywordInline, LookingForEntryInline, RumorInline, PhotoInline]
 
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ["__str__", "post", "author", "parent", "created_at"]
-    list_filter = ["post__run"]
+    list_display = ["__str__", "post", "author", "parent", "is_deleted", "created_at"]
+    list_filter = ["post__run", "is_deleted"]
     search_fields = ["body", "author__email"]
     raw_id_fields = ["author", "post", "parent"]

@@ -16,17 +16,17 @@ class Post(models.Model):
     run = models.ForeignKey("runs.Run", on_delete=models.CASCADE, related_name="posts")
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="posts")
     casting = models.ForeignKey(
-        "invites.Casting", on_delete=models.SET_NULL, null=True, blank=True, related_name="posts"
+        "casting.Casting", on_delete=models.SET_NULL, null=True, blank=True, related_name="posts"
     )
     post_type = models.CharField(max_length=20, choices=PostType.choices)
 
-    # Character introduction fields
-    character_name = models.CharField(max_length=300, blank=True)
-    description = models.TextField(blank=True)
+    # Shared fields
+    content = models.TextField(blank=True)
 
     # "Other" post fields
     title = models.CharField(max_length=500, blank=True)
     category = models.CharField(max_length=30, choices=OtherCategory.choices, blank=True)
+    club = models.ForeignKey("runs.Club", on_delete=models.SET_NULL, null=True, blank=True, related_name="posts")
 
     is_published = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -37,7 +37,9 @@ class Post(models.Model):
 
     def __str__(self):
         if self.post_type == self.PostType.CHARACTER:
-            return self.character_name or f"Post #{self.pk}"
+            if self.casting:
+                return self.casting.character_name or f"Post #{self.pk}"
+            return f"Post #{self.pk}"
         return self.title or f"Post #{self.pk}"
 
 
@@ -93,6 +95,7 @@ class Comment(models.Model):
     parent = models.ForeignKey("self", on_delete=models.CASCADE, null=True, blank=True, related_name="replies")
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="comments")
     body = models.TextField()
+    is_deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

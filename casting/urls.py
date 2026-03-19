@@ -1,5 +1,5 @@
 from django.urls import path
 
-app_name = "invites"
+app_name = "casting"
 
 urlpatterns = []

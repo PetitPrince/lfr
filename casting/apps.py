@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class InvitesConfig(AppConfig):
+class CastingConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
-    name = "invites"
+    name = "casting"

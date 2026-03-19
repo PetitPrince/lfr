@@ -28,7 +28,7 @@ INSTALLED_APPS = [
     "accounts",
     "runs",
     "posts",
-    "invites",
+    "casting",
 ]
 
 MIDDLEWARE = [

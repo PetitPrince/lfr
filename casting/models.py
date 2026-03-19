@@ -15,9 +15,9 @@ class Casting(models.Model):
         HEADMASTER = "headmaster", "Headmaster"
 
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="run_memberships"
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="castings"
     )
-    run = models.ForeignKey("runs.Run", on_delete=models.CASCADE, related_name="memberships")
+    run = models.ForeignKey("runs.Run", on_delete=models.CASCADE, related_name="castings")
 
     role = models.CharField(max_length=20, choices=Role.choices, default=Role.STUDENT)
     character_name = models.CharField(max_length=300, blank=True)
