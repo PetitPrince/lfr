@@ -1,0 +1,36 @@
+[project]
+name = "lfr"
+version = "0.1.0"
+description = "Looking for Relation — pre-game character relationship manager for Witchards LARP"
+requires-python = ">=3.12"
+dependencies = [
+    "django>=5.1,<5.2",
+    "django-htmx>=1.21",
+    "django-extensions>=3.2",
+    "Pillow>=11.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-django>=4.9",
+    "factory-boy>=3.3",
+    "black>=24.0",
+    "ruff>=0.8",
+    "django-debug-toolbar>=4.4",
+]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+
+[tool.black]
+target-version = ["py312"]
+line-length = 120
