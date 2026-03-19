@@ -1,7 +1,14 @@
 {
   "permissions": {
     "allow": [
-      "Bash(uv run:*)"
+      "Bash(uv run:*)",
+      "Skill(django-migrate)",
+      "Bash(git status:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Skill(generate-tests)",
+      "Bash(.venv/bin/python manage.py migrate 2>&1)",
+      "Bash(.venv/bin/python manage.py check)"
     ]
   }
 }
