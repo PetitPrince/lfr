@@ -17,12 +17,10 @@
 <article>
     <header><strong>Your Casting</strong></header>
     <table>
-        <tr><th>Character</th><td>{{ casting.character_name }}</td></tr>
         <tr><th>Role</th><td>{{ casting.get_role_display }}</td></tr>
         {% if casting.house %}<tr><th>House</th><td>{{ casting.house }}</td></tr>{% endif %}
         {% if casting.year %}<tr><th>Year</th><td>{{ casting.year }}</td></tr>{% endif %}
         {% if casting.path %}<tr><th>Path</th><td>{{ casting.path }}</td></tr>{% endif %}
-        {% if casting.blood_status %}<tr><th>Blood Status</th><td>{{ casting.blood_status }}</td></tr>{% endif %}
         {% if casting.teaching_subject %}<tr><th>Teaching</th><td>{{ casting.teaching_subject }}</td></tr>{% endif %}
         {% if casting.staff_title %}<tr><th>Title</th><td>{{ casting.staff_title }}</td></tr>{% endif %}
     </table>
@@ -32,6 +30,19 @@
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <input type="hidden" name="post_type" value="{{ post_type }}">
+
+    {% if post_type == "character" %}
+        <label for="id_character_name">Character Name</label>
+        <input type="text" name="character_name" id="id_character_name" value="{{ form.character_name.value|default:'' }}" required>
+
+        <label for="id_blood_status">Blood Status</label>
+        <select name="blood_status" id="id_blood_status">
+            <option value="">---</option>
+            {% for bs in form.fields.blood_status.queryset %}
+            <option value="{{ bs.pk }}" {% if form.blood_status.value|stringformat:"d" == bs.pk|stringformat:"d" %}selected{% endif %}>{{ bs }}</option>
+            {% endfor %}
+        </select>
+    {% endif %}
 
     {% if post_type == "other" %}
         <label for="id_title">Title</label>

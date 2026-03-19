@@ -35,6 +35,9 @@ class Casting(models.Model):
     )
     staff_title = models.CharField(max_length=300, blank=True)
     custom_attributes = models.JSONField(default=dict, blank=True)
+    allow_multiple_posts = models.BooleanField(
+        default=False, help_text="Allow this player to create multiple character introduction posts (e.g. split personality)."
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

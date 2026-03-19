@@ -24,14 +24,16 @@ class MessageBoardView(PlayerRunMixin, View):
         )
         paginator = Paginator(posts, 20)
         page = paginator.get_page(request.GET.get("page"))
-        has_character_post = Post.objects.filter(
+        character_post = Post.objects.filter(
             run=self.run, author=request.user, post_type=Post.PostType.CHARACTER
-        ).exists()
+        ).first()
+        can_create_character = character_post is None or self.casting.allow_multiple_posts
         return render(request, "player/message_board.html", {
             "run": self.run,
             "casting": self.casting,
             "page_obj": page,
-            "has_character_post": has_character_post,
+            "character_post": character_post,
+            "can_create_character": can_create_character,
         })
 
 
@@ -81,12 +83,24 @@ class PostDetailView(PlayerRunMixin, View):
 
 
 class PostCreateView(PlayerRunMixin, View):
+    def _has_character_post(self):
+        return Post.objects.filter(
+            run=self.run, author=self.request.user, post_type=Post.PostType.CHARACTER
+        ).exists()
+
+    def _can_create_character(self):
+        return not self._has_character_post() or self.casting.allow_multiple_posts
+
     def get(self, request, slug):
         post_type = request.GET.get("type", "character")
+        if post_type == "character" and not self._can_create_character():
+            messages.info(request, "You already have a character introduction. You can edit it instead.")
+            existing = Post.objects.get(run=self.run, author=request.user, post_type=Post.PostType.CHARACTER)
+            return redirect("posts:post_edit", slug=self.run.slug, pk=existing.pk)
         if post_type == "other":
             form = OtherPostForm(run=self.run)
         else:
-            form = CharacterPostForm()
+            form = CharacterPostForm(casting=self.casting)
         return render(request, "player/post_form.html", {
             "form": form,
             "run": self.run,
@@ -112,7 +126,10 @@ class PostCreateView(PlayerRunMixin, View):
                 messages.success(request, "Post created!")
                 return redirect("posts:message_board", slug=self.run.slug)
         else:
-            form = CharacterPostForm(request.POST)
+            if not self._can_create_character():
+                messages.error(request, "You already have a character introduction.")
+                return redirect("posts:message_board", slug=self.run.slug)
+            form = CharacterPostForm(request.POST, casting=self.casting)
             if form.is_valid():
                 post = form.save(commit=False)
                 post.run = self.run
@@ -120,6 +137,7 @@ class PostCreateView(PlayerRunMixin, View):
                 post.casting = self.casting
                 post.post_type = Post.PostType.CHARACTER
                 post.save()
+                _save_casting_fields(form, self.casting)
                 _save_keywords(request, post)
                 _save_looking_for(request, post)
                 _save_rumors(request, post)
@@ -143,7 +161,7 @@ class PostEditView(PlayerRunMixin, View):
         if post_type == Post.PostType.OTHER:
             form = OtherPostForm(run=self.run, instance=post)
         else:
-            form = CharacterPostForm(instance=post)
+            form = CharacterPostForm(instance=post, casting=self.casting)
         return render(request, "player/post_form.html", {
             "form": form,
             "run": self.run,
@@ -170,9 +188,10 @@ class PostEditView(PlayerRunMixin, View):
                 messages.success(request, "Post updated!")
                 return redirect("posts:post_detail", slug=self.run.slug, pk=post.pk)
         else:
-            form = CharacterPostForm(request.POST, instance=post)
+            form = CharacterPostForm(request.POST, instance=post, casting=self.casting)
             if form.is_valid():
                 post = form.save()
+                _save_casting_fields(form, self.casting)
                 post.keywords.all().delete()
                 post.looking_for_entries.all().delete()
                 post.rumors.all().delete()
@@ -402,6 +421,11 @@ class DiscoverOtherView(PlayerRunMixin, View):
 
 
 # --- Helpers ---
+
+def _save_casting_fields(form, casting):
+    casting.character_name = form.cleaned_data["character_name"]
+    casting.blood_status = form.cleaned_data["blood_status"]
+    casting.save(update_fields=["character_name", "blood_status"])
 
 def _build_comment_tree(comments):
     tree = []

@@ -1,3 +1,4 @@
+{% load markdown_filter %}
 <h4 style="margin-bottom:0.3em">
     {% if post.post_type == "character" and post.casting %}
         {{ post.casting.character_name }}
@@ -44,7 +45,6 @@
 </div>
 {% endif %}
 
-{% load markdown_filter %}
 <div style="margin:0.8em 0">{{ post.content|markdown }}</div>
 
 {% if post.looking_for_entries.all %}
