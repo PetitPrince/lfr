@@ -36,8 +36,6 @@
 </div>
 {% endif %}
 
-<div style="margin:0.8em 0">{{ post.content|linebreaksbr }}</div>
-
 {% if post.keywords.all %}
 <div style="margin:0.5em 0">
     {% for kw in post.keywords.all %}
@@ -45,6 +43,9 @@
     {% endfor %}
 </div>
 {% endif %}
+
+{% load markdown_filter %}
+<div style="margin:0.8em 0">{{ post.content|markdown }}</div>
 
 {% if post.looking_for_entries.all %}
 <div style="margin:0.5em 0">
