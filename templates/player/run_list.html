@@ -1,0 +1,28 @@
+{% extends "player/base.html" %}
+
+{% block title %}My Runs — LFR{% endblock %}
+
+{% block content %}
+<h2>My Runs</h2>
+
+{% if castings %}
+{% for c in castings %}
+<article>
+    <header>
+        <h3><a href="{% url 'posts:message_board' slug=c.run.slug %}">{{ c.run.name }}</a></h3>
+    </header>
+    <p>
+        <strong>{{ c.character_name }}</strong> — {{ c.get_role_display }}
+        {% if c.house %} &middot; {{ c.house }}{% endif %}
+        {% if c.year %} &middot; {{ c.year }}{% endif %}
+        {% if c.path %} &middot; {{ c.path }}{% endif %}
+    </p>
+    {% if c.run.start_date %}
+    <small class="text-muted">{{ c.run.start_date }} — {{ c.run.end_date|default:"TBD" }}</small>
+    {% endif %}
+</article>
+{% endfor %}
+{% else %}
+<p>You haven't joined any runs yet. Use an invite link from your organizer to get started.</p>
+{% endif %}
+{% endblock %}

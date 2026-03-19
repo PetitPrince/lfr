@@ -1,0 +1,79 @@
+{% extends "player/base.html" %}
+
+{% block title %}Students — {{ run.name }}{% endblock %}
+
+{% block content %}
+<h2>Discover Students</h2>
+
+<div style="display:grid; grid-template-columns: 250px 1fr; gap:2em;">
+    <aside class="filter-sidebar">
+        <form hx-get="{% url 'posts:student_filter' slug=run.slug %}"
+              hx-target="#student-results"
+              hx-swap="innerHTML"
+              hx-trigger="change, input[name='q'] changed delay:300ms">
+
+            <label for="f-house">House</label>
+            <select name="house" id="f-house">
+                <option value="">All</option>
+                {% for h in houses %}<option value="{{ h.pk }}">{{ h }}</option>{% endfor %}
+            </select>
+
+            <label for="f-year">Year</label>
+            <select name="year" id="f-year">
+                <option value="">All</option>
+                {% for y in years %}<option value="{{ y.pk }}">{{ y }}</option>{% endfor %}
+            </select>
+
+            <label for="f-path">Path</label>
+            <select name="path" id="f-path">
+                <option value="">All</option>
+                {% for p in paths %}<option value="{{ p.pk }}">{{ p }}</option>{% endfor %}
+            </select>
+
+            <label for="f-club">Club</label>
+            <select name="club" id="f-club">
+                <option value="">All</option>
+                {% for c in clubs %}<option value="{{ c.pk }}">{{ c }}</option>{% endfor %}
+            </select>
+
+            <label for="f-blood">Blood Status</label>
+            <select name="blood_status" id="f-blood">
+                <option value="">All</option>
+                {% for b in blood_statuses %}<option value="{{ b.pk }}">{{ b }}</option>{% endfor %}
+            </select>
+
+            {% for attr in custom_attrs %}
+            <label for="f-custom-{{ attr.pk }}">{{ attr.name }}</label>
+            {% if attr.attr_type == "boolean" %}
+            <select name="custom_{{ attr.pk }}" id="f-custom-{{ attr.pk }}">
+                <option value="">All</option>
+                <option value="true">Yes</option>
+            </select>
+            {% elif attr.attr_type == "choice" %}
+            <select name="custom_{{ attr.pk }}" id="f-custom-{{ attr.pk }}">
+                <option value="">All</option>
+                {% for choice in attr.choices %}<option value="{{ choice }}">{{ choice }}</option>{% endfor %}
+            </select>
+            {% endif %}
+            {% endfor %}
+
+            <label for="f-q">Search</label>
+            <input type="search" name="q" id="f-q" placeholder="Name, description...">
+        </form>
+    </aside>
+
+    <div>
+        <div class="hallway-widget"
+             hx-get="{% url 'posts:student_random' slug=run.slug %}"
+             hx-trigger="load"
+             hx-swap="innerHTML">
+        </div>
+
+        <div id="student-results"
+             hx-get="{% url 'posts:student_filter' slug=run.slug %}"
+             hx-trigger="load"
+             hx-swap="innerHTML">
+        </div>
+    </div>
+</div>
+{% endblock %}

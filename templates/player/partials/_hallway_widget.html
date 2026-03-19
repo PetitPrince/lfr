@@ -1,0 +1,11 @@
+{% if posts %}
+<strong>Someone you might meet in the hallways...</strong>
+{% for post in posts %}
+<div style="margin:0.5em 0">
+    <a href="{% url 'posts:post_detail' slug=run.slug pk=post.pk %}">{{ post.casting.character_name }}</a>
+    {% if post.casting.house %}<span class="badge">{{ post.casting.house }}</span>{% endif %}
+    {% if post.casting.year %}<span class="badge">{{ post.casting.year }}</span>{% endif %}
+    <br><small>{{ post.content|truncatechars:80 }}</small>
+</div>
+{% endfor %}
+{% endif %}

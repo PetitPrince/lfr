@@ -1,0 +1,75 @@
+<h4 style="margin-bottom:0.3em">
+    {% if post.post_type == "character" and post.casting %}
+        {{ post.casting.character_name }}
+    {% else %}
+        {{ post.title }}
+    {% endif %}
+</h4>
+
+<small class="text-muted">
+    {% if post.post_type == "character" and post.casting %}
+        <span class="badge">{{ post.casting.get_role_display }}</span>
+        {% if post.casting.house %}<span class="badge">{{ post.casting.house }}</span>{% endif %}
+        {% if post.casting.year %}<span class="badge">{{ post.casting.year }}</span>{% endif %}
+        {% if post.casting.path %}<span class="badge">{{ post.casting.path }}</span>{% endif %}
+        {% if post.casting.blood_status %}<span class="badge">{{ post.casting.blood_status }}</span>{% endif %}
+        {% if post.casting.teaching_subject %}<span class="badge">Teaching: {{ post.casting.teaching_subject }}</span>{% endif %}
+        {% if post.casting.monitor_of_house %}<span class="badge">Monitor of {{ post.casting.monitor_of_house }}</span>{% endif %}
+        {% if post.casting.monitor_of_club %}<span class="badge">Monitor of {{ post.casting.monitor_of_club }}</span>{% endif %}
+        {% if post.casting.staff_title %}<span class="badge">{{ post.casting.staff_title }}</span>{% endif %}
+    {% else %}
+        <span class="badge">{{ post.get_category_display }}</span>
+        {% if post.club %}<span class="badge">{{ post.club }}</span>{% endif %}
+    {% endif %}
+    &middot; {{ post.created_at|timesince }} ago
+    {% if post.author == request.user %}
+    &middot; <a href="{% url 'posts:post_edit' slug=run.slug pk=post.pk %}">Edit</a>
+    {% endif %}
+</small>
+
+{% if post.casting.clubs.all %}
+<div style="margin-top:0.3em">
+    <small>Clubs:</small>
+    {% for club in post.casting.clubs.all %}
+    <span class="chip">{{ club }}</span>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div style="margin:0.8em 0">{{ post.content|linebreaksbr }}</div>
+
+{% if post.keywords.all %}
+<div style="margin:0.5em 0">
+    {% for kw in post.keywords.all %}
+    <span class="chip">{{ kw.label }}</span>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if post.looking_for_entries.all %}
+<div style="margin:0.5em 0">
+    <strong>Looking for:</strong>
+    {% for lf in post.looking_for_entries.all %}
+    <div class="looking-for-item">
+        <strong>{{ lf.label }}</strong>{% if lf.description %} — {{ lf.description }}{% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if post.rumors.all %}
+<div style="margin:0.5em 0">
+    <strong>Rumors:</strong>
+    {% for rumor in post.rumors.all %}
+    <div class="rumor">{{ rumor.text }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if post.photos.all %}
+<div class="photo-gallery" style="margin:0.5em 0">
+    {% for photo in post.photos.all %}
+    <img src="{{ photo.image.url }}" alt="{{ photo.caption }}" title="{{ photo.caption }}">
+    {% endfor %}
+</div>
+{% endif %}

@@ -1,0 +1,23 @@
+{% extends "player/base.html" %}
+
+{% block title %}Other Posts — {{ run.name }}{% endblock %}
+
+{% block content %}
+<h2>Other Posts</h2>
+
+<label for="f-category">Category</label>
+<select id="f-category"
+        hx-get="{% url 'posts:discover_other' slug=run.slug %}"
+        hx-target="#other-results"
+        hx-swap="innerHTML"
+        name="category">
+    <option value="">All</option>
+    {% for val, label in categories %}
+    <option value="{{ val }}">{{ label }}</option>
+    {% endfor %}
+</select>
+
+<div id="other-results">
+    {% include "player/partials/_other_results.html" %}
+</div>
+{% endblock %}

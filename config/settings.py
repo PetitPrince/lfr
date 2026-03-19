@@ -92,5 +92,5 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "accounts.User"
 
-LOGIN_URL = "/organize/login/"
-LOGIN_REDIRECT_URL = "/organize/"
+LOGIN_URL = "/accounts/login/"
+LOGIN_REDIRECT_URL = "/runs/"

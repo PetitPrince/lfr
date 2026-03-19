@@ -1,0 +1,24 @@
+{% extends "player/base.html" %}
+
+{% block title %}{% if post.post_type == "character" and post.casting %}{{ post.casting.character_name }}{% else %}{{ post.title }}{% endif %} — {{ run.name }}{% endblock %}
+
+{% block content %}
+<article>
+    {% include "player/partials/_post_content.html" %}
+
+    {% if post.author == request.user %}
+    <div style="margin-top:1em">
+        <a href="{% url 'posts:post_edit' slug=run.slug pk=post.pk %}" role="button" class="outline">Edit</a>
+        <form method="post" action="{% url 'posts:post_delete' slug=run.slug pk=post.pk %}" style="display:inline">
+            {% csrf_token %}
+            <button type="submit" class="outline secondary" onclick="return confirm('Delete this post?')">Delete</button>
+        </form>
+    </div>
+    {% endif %}
+</article>
+
+<h3>Comments</h3>
+<div id="comments-{{ post.pk }}">
+    {% include "player/partials/_comment_thread.html" %}
+</div>
+{% endblock %}

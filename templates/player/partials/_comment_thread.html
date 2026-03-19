@@ -1,0 +1,39 @@
+{% for comment in comments %}
+<div class="comment" id="comment-{{ comment.pk }}">
+    <small>
+        <strong>{{ comment.author.email }}</strong> &middot; {{ comment.created_at|timesince }} ago
+    </small>
+    {% if comment.is_deleted %}
+    <p class="text-muted"><em>[deleted]</em></p>
+    {% else %}
+    <p>{{ comment.body|linebreaksbr }}</p>
+    {% endif %}
+    <button class="outline secondary" style="padding:0.1em 0.5em; font-size:0.8em"
+            hx-get="{% url 'posts:comment_reply' slug=run.slug pk=post.pk comment_id=comment.pk %}"
+            hx-target="#reply-form-{{ comment.pk }}"
+            hx-swap="innerHTML">Reply</button>
+    <div id="reply-form-{{ comment.pk }}"></div>
+    {% if comment.children %}
+    <div class="comment-thread">
+        {% with comments=comment.children is_nested=True %}
+        {% include "player/partials/_comment_thread.html" %}
+        {% endwith %}
+    </div>
+    {% endif %}
+</div>
+{% endfor %}
+
+{% if not comments and comment_form and not is_nested %}
+<p class="text-muted">No comments yet.</p>
+{% endif %}
+
+{% if comment_form and not is_nested %}
+<form hx-post="{% url 'posts:comment_create' slug=run.slug pk=post.pk %}"
+      hx-target="#comments-{{ post.pk }}"
+      hx-swap="innerHTML"
+      style="margin-top:1em">
+    {% csrf_token %}
+    <textarea name="body" rows="3" placeholder="Write a comment..." required></textarea>
+    <button type="submit">Comment</button>
+</form>
+{% endif %}

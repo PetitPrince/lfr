@@ -1,0 +1,15 @@
+{% for post in posts %}
+<article>
+    <header>
+        <h4><a href="{% url 'posts:post_detail' slug=run.slug pk=post.pk %}">{{ post.title }}</a></h4>
+        <small class="text-muted">
+            <span class="badge">{{ post.get_category_display }}</span>
+            {% if post.club %}<span class="badge">{{ post.club }}</span>{% endif %}
+            &middot; {{ post.created_at|timesince }} ago
+        </small>
+    </header>
+    <p>{{ post.content|truncatechars:200 }}</p>
+</article>
+{% empty %}
+<p class="text-muted">No posts in this category.</p>
+{% endfor %}

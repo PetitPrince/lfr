@@ -1,0 +1,11 @@
+<div>
+    {% include "player/partials/_post_content.html" %}
+
+    <div style="margin-top:1em" id="comments-{{ post.pk }}">
+        {% include "player/partials/_comment_thread.html" %}
+    </div>
+
+    <div style="margin-top:0.5em">
+        <a href="{% url 'posts:post_detail' slug=run.slug pk=post.pk %}" class="outline" style="padding:0.2em 0.8em" role="button">Full page</a>
+    </div>
+</div>

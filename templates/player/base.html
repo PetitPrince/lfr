@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}LFR{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <style>
+        .chip {
+            display: inline-block;
+            padding: 0.2em 0.6em;
+            margin: 0.15em;
+            background: var(--pico-secondary-background);
+            border-radius: 1em;
+            font-size: 0.85em;
+        }
+        .chip-keyword {
+            cursor: pointer;
+        }
+        .chip-keyword:hover {
+            background: var(--pico-primary-background);
+        }
+        .flash-success { color: var(--pico-ins-color); }
+        .flash-error { color: var(--pico-del-color); }
+        .flash-info { color: var(--pico-primary); }
+        .text-error { color: var(--pico-del-color); }
+        .text-muted { opacity: 0.6; }
+        .badge {
+            display: inline-block;
+            padding: 0.15em 0.5em;
+            margin: 0.1em;
+            background: var(--pico-primary-background);
+            border-radius: 0.3em;
+            font-size: 0.8em;
+        }
+        .post-preview { border-bottom: 1px solid var(--pico-muted-border-color); padding: 1em 0; }
+        .post-preview:last-child { border-bottom: none; }
+        .faculty-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1em; }
+        .faculty-card { text-align: center; }
+        .faculty-card img { width: 150px; height: 150px; object-fit: cover; border-radius: 50%; }
+        .comment-thread { margin-left: 1.5em; border-left: 2px solid var(--pico-muted-border-color); padding-left: 1em; }
+        .comment { margin: 0.5em 0; }
+        .hallway-widget { background: var(--pico-card-background-color); padding: 1em; border-radius: 0.5em; margin-bottom: 1em; }
+        .filter-sidebar label { margin-bottom: 0.3em; }
+        .looking-for-item { margin-bottom: 0.5em; }
+        nav .brand { font-weight: bold; }
+        .cta-banner { background: var(--pico-primary-background); padding: 1em; border-radius: 0.5em; margin-bottom: 1em; }
+        table { width: 100%; }
+        .photo-gallery { display: flex; flex-wrap: wrap; gap: 0.5em; }
+        .photo-gallery img { max-width: 200px; max-height: 200px; object-fit: cover; border-radius: 0.3em; }
+        .rumor { font-style: italic; padding: 0.3em 0; border-left: 3px solid var(--pico-muted-border-color); padding-left: 0.8em; margin: 0.3em 0; }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <nav class="container-fluid">
+        <ul>
+            <li>
+                {% if run %}
+                <a href="{% url 'posts:message_board' slug=run.slug %}" class="brand">{{ run.name }}</a>
+                {% else %}
+                <a href="{% url 'runs:run_list' %}" class="brand">LFR</a>
+                {% endif %}
+            </li>
+        </ul>
+        <ul>
+            {% if run %}
+            <li><a href="{% url 'posts:message_board' slug=run.slug %}">Board</a></li>
+            <li><a href="{% url 'posts:discover_faculty' slug=run.slug %}">Faculty</a></li>
+            <li><a href="{% url 'posts:discover_students' slug=run.slug %}">Students</a></li>
+            <li><a href="{% url 'posts:discover_other' slug=run.slug %}">Other</a></li>
+            {% endif %}
+            {% if user.is_authenticated %}
+            <li><small>{{ user.email }}</small></li>
+            <li>
+                <form method="post" action="{% url 'accounts:logout' %}" style="margin:0">
+                    {% csrf_token %}
+                    <button type="submit" class="outline secondary" style="padding:0.3em 0.8em;margin:0">Logout</button>
+                </form>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <main class="container">
+        {% if messages %}
+        {% for message in messages %}
+        <article>
+            <p class="flash-{{ message.tags }}">{{ message }}</p>
+        </article>
+        {% endfor %}
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="container">
+        <small class="text-muted">LFR — Looking for Relation</small>
+    </footer>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

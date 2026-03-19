@@ -1,0 +1,29 @@
+<div>
+    <h4 style="margin-bottom:0.3em">
+        {% if post.post_type == "character" and post.casting %}
+            <a href="{% url 'posts:post_detail' slug=run.slug pk=post.pk %}">{{ post.casting.character_name }}</a>
+        {% else %}
+            <a href="{% url 'posts:post_detail' slug=run.slug pk=post.pk %}">{{ post.title }}</a>
+        {% endif %}
+    </h4>
+    <small class="text-muted">
+        {% if post.post_type == "character" and post.casting %}
+            <span class="badge">{{ post.casting.get_role_display }}</span>
+            {% if post.casting.house %}<span class="badge">{{ post.casting.house }}</span>{% endif %}
+            {% if post.casting.year %}<span class="badge">{{ post.casting.year }}</span>{% endif %}
+        {% else %}
+            <span class="badge">{{ post.get_category_display }}</span>
+        {% endif %}
+        &middot; {{ post.created_at|timesince }} ago
+    </small>
+    <p style="margin:0.5em 0">{{ post.content|truncatechars:150 }}</p>
+    {% for kw in post.keywords.all %}
+    <span class="chip">{{ kw.label }}</span>
+    {% endfor %}
+    <div style="margin-top:0.5em">
+        <button class="outline secondary" style="padding:0.2em 0.8em"
+                hx-get="{% url 'posts:post_expand' slug=run.slug pk=post.pk %}"
+                hx-target="#post-{{ post.pk }}"
+                hx-swap="innerHTML">Read more</button>
+    </div>
+</div>

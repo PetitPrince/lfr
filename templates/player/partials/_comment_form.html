@@ -1,0 +1,8 @@
+<form hx-post="{% url 'posts:comment_reply' slug=run.slug pk=post.pk comment_id=parent.pk %}"
+      hx-target="#comments-{{ post.pk }}"
+      hx-swap="innerHTML"
+      style="margin-top:0.5em">
+    {% csrf_token %}
+    <textarea name="body" rows="2" placeholder="Write a reply..." required style="font-size:0.9em"></textarea>
+    <button type="submit" style="padding:0.2em 0.8em; font-size:0.85em">Reply</button>
+</form>
