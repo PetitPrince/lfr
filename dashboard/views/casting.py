@@ -12,7 +12,7 @@ from dashboard.mixins import RunMixin
 class CastingListView(RunMixin, View):
     def get(self, request, slug):
         castings = self.run.castings.select_related(
-            "user", "house", "year", "path", "blood_status"
+            "user", "house", "year", "path", "blood_status", "monitor_of_house"
         ).order_by("-created_at")
         return render(request, "dashboard/casting/list.html", {
             "run": self.run,

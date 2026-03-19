@@ -114,10 +114,10 @@ def parse_casting_csv(csv_text, run):
                 parsed.errors.append(f"Unknown blood status: '{blood_status}'")
             data["blood_status"] = blood_status
 
-        # Clubs (comma-separated)
+        # Clubs (semicolon-separated within the cell)
         clubs_str = row.get("clubs", "")
         if clubs_str:
-            club_list = [c.strip() for c in clubs_str.split(",") if c.strip()]
+            club_list = [c.strip() for c in clubs_str.split(";") if c.strip()]
             for c in club_list:
                 if c not in club_names:
                     parsed.errors.append(f"Unknown club: '{c}'")

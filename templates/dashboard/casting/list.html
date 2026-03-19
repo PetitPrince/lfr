@@ -32,7 +32,7 @@
         <tr>
             <td>{{ casting.character_name|default:"—" }}</td>
             <td>{{ casting.get_role_display }}</td>
-            <td>{{ casting.house|default:"—" }}</td>
+            <td>{{ casting.house|default:casting.monitor_of_house|default:"—" }}</td>
             <td>{{ casting.year|default:"—" }}</td>
             <td>
                 {% if casting.user %}
