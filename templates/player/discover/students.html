@@ -15,31 +15,31 @@
             <label for="f-house">House</label>
             <select name="house" id="f-house">
                 <option value="">All</option>
-                {% for h in houses %}<option value="{{ h.pk }}">{{ h }}</option>{% endfor %}
+                {% for h in houses %}<option value="{{ h.pk }}" {% if initial_filters.house == h.pk|stringformat:"d" %}selected{% endif %}>{{ h }}</option>{% endfor %}
             </select>
 
             <label for="f-year">Year</label>
             <select name="year" id="f-year">
                 <option value="">All</option>
-                {% for y in years %}<option value="{{ y.pk }}">{{ y }}</option>{% endfor %}
+                {% for y in years %}<option value="{{ y.pk }}" {% if initial_filters.year == y.pk|stringformat:"d" %}selected{% endif %}>{{ y }}</option>{% endfor %}
             </select>
 
             <label for="f-path">Path</label>
             <select name="path" id="f-path">
                 <option value="">All</option>
-                {% for p in paths %}<option value="{{ p.pk }}">{{ p }}</option>{% endfor %}
+                {% for p in paths %}<option value="{{ p.pk }}" {% if initial_filters.path == p.pk|stringformat:"d" %}selected{% endif %}>{{ p }}</option>{% endfor %}
             </select>
 
             <label for="f-club">Club</label>
             <select name="club" id="f-club">
                 <option value="">All</option>
-                {% for c in clubs %}<option value="{{ c.pk }}">{{ c }}</option>{% endfor %}
+                {% for c in clubs %}<option value="{{ c.pk }}" {% if initial_filters.club == c.pk|stringformat:"d" %}selected{% endif %}>{{ c }}</option>{% endfor %}
             </select>
 
             <label for="f-blood">Blood Status</label>
             <select name="blood_status" id="f-blood">
                 <option value="">All</option>
-                {% for b in blood_statuses %}<option value="{{ b.pk }}">{{ b }}</option>{% endfor %}
+                {% for b in blood_statuses %}<option value="{{ b.pk }}" {% if initial_filters.blood_status == b.pk|stringformat:"d" %}selected{% endif %}>{{ b }}</option>{% endfor %}
             </select>
 
             {% for attr in custom_attrs %}
@@ -57,8 +57,13 @@
             {% endif %}
             {% endfor %}
 
+            {% if initial_filters.keyword %}
+            <input type="hidden" name="keyword" value="{{ initial_filters.keyword }}">
+            <p><small>Keyword: <strong>{{ initial_filters.keyword }}</strong> <a href="{% url 'posts:discover_students' slug=run.slug %}">clear</a></small></p>
+            {% endif %}
+
             <label for="f-q">Search</label>
-            <input type="search" name="q" id="f-q" placeholder="Name, description...">
+            <input type="search" name="q" id="f-q" placeholder="Name, description..." value="{{ initial_filters.q|default:'' }}">
         </form>
     </aside>
 
@@ -72,7 +77,8 @@
         <div id="student-results"
              hx-get="{% url 'posts:student_filter' slug=run.slug %}"
              hx-trigger="load"
-             hx-swap="innerHTML">
+             hx-swap="innerHTML"
+             hx-include=".filter-sidebar form">
         </div>
     </div>
 </div>

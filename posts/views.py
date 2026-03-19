@@ -302,6 +302,10 @@ class DiscoverStudentsView(PlayerRunMixin, View):
         custom_attrs = CustomAttributeDefinition.objects.filter(
             run=self.run, is_filterable=True,
         ).filter(Q(applies_to="student") | Q(applies_to="all"))
+        # Pass through any initial filter params (used by links from post detail)
+        initial_filters = {
+            k: v for k, v in request.GET.items() if v
+        }
         return render(request, "player/discover/students.html", {
             "run": self.run,
             "casting": self.casting,
@@ -311,6 +315,7 @@ class DiscoverStudentsView(PlayerRunMixin, View):
             "clubs": self.run.clubs.all(),
             "blood_statuses": self.run.blood_statuses.all(),
             "custom_attrs": custom_attrs,
+            "initial_filters": initial_filters,
         })
 
 
@@ -417,6 +422,7 @@ class DiscoverOtherView(PlayerRunMixin, View):
             "casting": self.casting,
             "posts": posts,
             "categories": Post.OtherCategory.choices,
+            "initial_category": request.GET.get("category", ""),
         })
 
 

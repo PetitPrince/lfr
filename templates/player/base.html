@@ -11,15 +11,18 @@
             display: inline-block;
             padding: 0.2em 0.6em;
             margin: 0.15em;
-            background: var(--pico-secondary-background);
+            background: var(--pico-muted-border-color);
+            color: var(--pico-color);
             border-radius: 1em;
             font-size: 0.85em;
+            text-decoration: none;
         }
         .chip-keyword {
             cursor: pointer;
         }
         .chip-keyword:hover {
-            background: var(--pico-primary-background);
+            background: var(--pico-secondary);
+            color: var(--pico-secondary-inverse);
         }
         .flash-success { color: var(--pico-ins-color); }
         .flash-error { color: var(--pico-del-color); }
@@ -30,9 +33,15 @@
             display: inline-block;
             padding: 0.15em 0.5em;
             margin: 0.1em;
-            background: var(--pico-primary-background);
+            background: var(--pico-muted-border-color);
+            color: var(--pico-color);
             border-radius: 0.3em;
             font-size: 0.8em;
+            text-decoration: none;
+        }
+        a.badge:hover, a.chip:hover {
+            background: var(--pico-secondary);
+            color: var(--pico-secondary-inverse);
         }
         .post-preview { border-bottom: 1px solid var(--pico-muted-border-color); padding: 1em 0; }
         .post-preview:last-child { border-bottom: none; }
@@ -45,7 +54,7 @@
         .filter-sidebar label { margin-bottom: 0.3em; }
         .looking-for-item { margin-bottom: 0.5em; }
         nav .brand { font-weight: bold; }
-        .cta-banner { background: var(--pico-primary-background); padding: 1em; border-radius: 0.5em; margin-bottom: 1em; }
+        .cta-banner { background: var(--pico-card-background-color); padding: 1em; border-radius: 0.5em; margin-bottom: 1em; border: 1px solid var(--pico-muted-border-color); }
         table { width: 100%; }
         .photo-gallery { display: flex; flex-wrap: wrap; gap: 0.5em; }
         .photo-gallery img { max-width: 200px; max-height: 200px; object-fit: cover; border-radius: 0.3em; }
@@ -82,6 +91,13 @@
             {% endif %}
         </ul>
     </nav>
+
+    {% load post_tags %}
+    {% if run %}
+    <div class="container">
+        {% random_rumor run %}
+    </div>
+    {% endif %}
 
     <main class="container">
         {% if messages %}

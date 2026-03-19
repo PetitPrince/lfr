@@ -13,7 +13,7 @@
         name="category">
     <option value="">All</option>
     {% for val, label in categories %}
-    <option value="{{ val }}">{{ label }}</option>
+    <option value="{{ val }}" {% if initial_category == val %}selected{% endif %}>{{ label }}</option>
     {% endfor %}
 </select>
 

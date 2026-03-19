@@ -10,17 +10,17 @@
 <small class="text-muted">
     {% if post.post_type == "character" and post.casting %}
         <span class="badge">{{ post.casting.get_role_display }}</span>
-        {% if post.casting.house %}<span class="badge">{{ post.casting.house }}</span>{% endif %}
-        {% if post.casting.year %}<span class="badge">{{ post.casting.year }}</span>{% endif %}
-        {% if post.casting.path %}<span class="badge">{{ post.casting.path }}</span>{% endif %}
-        {% if post.casting.blood_status %}<span class="badge">{{ post.casting.blood_status }}</span>{% endif %}
+        {% if post.casting.house %}<a href="{% url 'posts:discover_students' slug=run.slug %}?house={{ post.casting.house.pk }}" class="badge">{{ post.casting.house }}</a>{% endif %}
+        {% if post.casting.year %}<a href="{% url 'posts:discover_students' slug=run.slug %}?year={{ post.casting.year.pk }}" class="badge">{{ post.casting.year }}</a>{% endif %}
+        {% if post.casting.path %}<a href="{% url 'posts:discover_students' slug=run.slug %}?path={{ post.casting.path.pk }}" class="badge">{{ post.casting.path }}</a>{% endif %}
+        {% if post.casting.blood_status %}<a href="{% url 'posts:discover_students' slug=run.slug %}?blood_status={{ post.casting.blood_status.pk }}" class="badge">{{ post.casting.blood_status }}</a>{% endif %}
         {% if post.casting.teaching_subject %}<span class="badge">Teaching: {{ post.casting.teaching_subject }}</span>{% endif %}
         {% if post.casting.monitor_of_house %}<span class="badge">Monitor of {{ post.casting.monitor_of_house }}</span>{% endif %}
         {% if post.casting.monitor_of_club %}<span class="badge">Monitor of {{ post.casting.monitor_of_club }}</span>{% endif %}
         {% if post.casting.staff_title %}<span class="badge">{{ post.casting.staff_title }}</span>{% endif %}
     {% else %}
-        <span class="badge">{{ post.get_category_display }}</span>
-        {% if post.club %}<span class="badge">{{ post.club }}</span>{% endif %}
+        <a href="{% url 'posts:discover_other' slug=run.slug %}?category={{ post.category }}" class="badge">{{ post.get_category_display }}</a>
+        {% if post.club %}<a href="{% url 'posts:discover_students' slug=run.slug %}?club={{ post.club.pk }}" class="badge">{{ post.club }}</a>{% endif %}
     {% endif %}
     &middot; {{ post.created_at|timesince }} ago
     {% if post.author == request.user %}
@@ -32,7 +32,7 @@
 <div style="margin-top:0.3em">
     <small>Clubs:</small>
     {% for club in post.casting.clubs.all %}
-    <span class="chip">{{ club }}</span>
+    <a href="{% url 'posts:discover_students' slug=run.slug %}?club={{ club.pk }}" class="chip">{{ club }}</a>
     {% endfor %}
 </div>
 {% endif %}
@@ -40,7 +40,7 @@
 {% if post.keywords.all %}
 <div style="margin:0.5em 0">
     {% for kw in post.keywords.all %}
-    <span class="chip">{{ kw.label }}</span>
+    <a href="{% url 'posts:discover_students' slug=run.slug %}?keyword={{ kw.label|urlencode }}" class="chip chip-keyword">{{ kw.label }}</a>
     {% endfor %}
 </div>
 {% endif %}
