@@ -95,6 +95,21 @@ class CastingDeleteView(RunMixin, View):
         return response
 
 
+class CastingRoleFieldsView(RunMixin, View):
+    """HTMX: return role-specific form fields when role changes."""
+
+    def get(self, request, slug):
+        role = request.GET.get("role", "student")
+        casting_id = request.GET.get("casting_id")
+        instance = None
+        if casting_id:
+            instance = Casting.objects.filter(pk=casting_id, run=self.run).first()
+        form = CastingForm(run=self.run, role=role, instance=instance)
+        return render(request, "dashboard/casting/_role_fields.html", {
+            "form": form,
+        })
+
+
 class CSVUploadView(RunMixin, View):
     def get(self, request, slug):
         form = CSVUploadForm()

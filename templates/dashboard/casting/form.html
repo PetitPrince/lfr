@@ -8,27 +8,29 @@
 <form method="post">
     {% csrf_token %}
 
-    {% for field in form %}
-    {% if field.name == "clubs" or field.name == "teaching_subjects" %}
-    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-    {{ field }}
-    {% elif field.html_name|truncatewords:1 == "custom_…" or field.name|slice:":7" == "custom_" %}
-    {% if field.field.widget.input_type == "checkbox" %}
-    <fieldset>
-        <label>{{ field }} {{ field.label }}</label>
-    </fieldset>
-    {% else %}
-    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-    {{ field }}
+    <label for="id_role">Role</label>
+    <select name="role" id="id_role"
+            hx-get="{% url 'dashboard:casting_role_fields' slug=run.slug %}{% if casting %}?casting_id={{ casting.pk }}{% endif %}"
+            hx-target="#role-fields"
+            hx-swap="innerHTML"
+            hx-include="[name='role']">
+        {% for value, label in form.fields.role.choices %}
+        <option value="{{ value }}" {% if form.role.value == value or form.initial.role == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+    </select>
+    {% if form.role.errors %}
+    <small class="text-error">{{ form.role.errors.0 }}</small>
     {% endif %}
-    {% else %}
-    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-    {{ field }}
+
+    <label for="id_character_name">Character name</label>
+    {{ form.character_name }}
+    {% if form.character_name.errors %}
+    <small class="text-error">{{ form.character_name.errors.0 }}</small>
     {% endif %}
-    {% if field.errors %}
-    <small class="text-error">{{ field.errors.0 }}</small>
-    {% endif %}
-    {% endfor %}
+
+    <div id="role-fields">
+        {% include "dashboard/casting/_role_fields.html" %}
+    </div>
 
     <button type="submit">{% if is_edit %}Save{% else %}Create{% endif %}</button>
     <a href="{% url 'dashboard:casting_list' slug=run.slug %}" role="button" class="outline secondary">Cancel</a>

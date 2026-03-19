@@ -6,6 +6,7 @@ from dashboard.views.casting import (
     CastingDeleteView,
     CastingEditView,
     CastingListView,
+    CastingRoleFieldsView,
     CSVUploadConfirmView,
     CSVUploadPreviewView,
     CSVUploadView,
@@ -42,6 +43,7 @@ urlpatterns = [
     path("<slug:slug>/custom-attributes/<int:attr_id>/delete/", CustomAttributeDeleteView.as_view(), name="custom_attr_delete"),
     # Castings
     path("<slug:slug>/castings/", CastingListView.as_view(), name="casting_list"),
+    path("<slug:slug>/castings/role-fields/", CastingRoleFieldsView.as_view(), name="casting_role_fields"),
     path("<slug:slug>/castings/create/", CastingCreateView.as_view(), name="casting_create"),
     path("<slug:slug>/castings/<int:casting_id>/edit/", CastingEditView.as_view(), name="casting_edit"),
     path("<slug:slug>/castings/<int:casting_id>/delete/", CastingDeleteView.as_view(), name="casting_delete"),

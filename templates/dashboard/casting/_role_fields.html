@@ -1,0 +1,15 @@
+{% for field in form.role_specific_fields %}
+{% if field.field.widget.input_type == "checkbox" %}
+<fieldset>
+    <label>{{ field }} {{ field.label }}</label>
+</fieldset>
+{% else %}
+<label for="{{ field.id_for_label }}">{{ field.label }}</label>
+{{ field }}
+{% endif %}
+{% if field.errors %}
+<small class="text-error">{{ field.errors.0 }}</small>
+{% endif %}
+{% empty %}
+<p class="text-muted">No additional fields for this role.</p>
+{% endfor %}
