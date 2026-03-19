@@ -1,0 +1,30 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Settings — {{ run.name }}{% endblock %}
+
+{% block content %}
+<h2>Settings: {{ run.name }}</h2>
+
+<form method="post">
+    {% csrf_token %}
+
+    {% for field in form %}
+    {% if field.name == "is_active" %}
+    <fieldset>
+        <label>
+            {{ field }} {{ field.label }}
+        </label>
+    </fieldset>
+    {% else %}
+    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+    {{ field }}
+    {% endif %}
+    {% if field.errors %}
+    <small class="text-error">{{ field.errors.0 }}</small>
+    {% endif %}
+    {% endfor %}
+
+    <button type="submit">Save</button>
+    <a href="{% url 'dashboard:run_detail' slug=run.slug %}" role="button" class="outline secondary">Cancel</a>
+</form>
+{% endblock %}

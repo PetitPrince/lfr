@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Organizer Dashboard{% endblock %} — LFR</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <style>
+        .chip {
+            display: inline-block;
+            padding: 0.2em 0.6em;
+            margin: 0.15em;
+            background: var(--pico-secondary-background);
+            border-radius: 1em;
+            font-size: 0.85em;
+        }
+        .flash-success { color: var(--pico-ins-color); }
+        .flash-error { color: var(--pico-del-color); }
+        .flash-info { color: var(--pico-primary); }
+        .row-valid { background: var(--pico-ins-color); opacity: 0.15; }
+        .text-error { color: var(--pico-del-color); }
+        .text-success { color: var(--pico-ins-color); }
+        .text-muted { opacity: 0.6; }
+        nav .brand { font-weight: bold; }
+        table { width: 100%; }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <nav class="container-fluid">
+        <ul>
+            <li><a href="{% url 'dashboard:run_list' %}" class="brand">LFR Organizer</a></li>
+        </ul>
+        <ul>
+            {% if user.is_authenticated %}
+            <li><small>{{ user.email }}</small></li>
+            <li>
+                <form method="post" action="{% url 'dashboard:logout' %}" style="margin:0">
+                    {% csrf_token %}
+                    <button type="submit" class="outline secondary" style="padding:0.3em 0.8em;margin:0">Logout</button>
+                </form>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <main class="container">
+        {% if messages %}
+        {% for message in messages %}
+        <article>
+            <p class="flash-{{ message.tags }}">{{ message }}</p>
+        </article>
+        {% endfor %}
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="container">
+        <small class="text-muted">LFR — Looking for Relation</small>
+    </footer>
+
+    <script>
+    function copyToClipboard(text, btn) {
+        navigator.clipboard.writeText(text).then(function() {
+            var orig = btn.textContent;
+            btn.textContent = 'Copied!';
+            setTimeout(function() { btn.textContent = orig; }, 1500);
+        });
+    }
+    </script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

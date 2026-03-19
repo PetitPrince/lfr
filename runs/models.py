@@ -75,6 +75,7 @@ class Run(models.Model):
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
+    is_template = models.BooleanField(default=False, help_text="Template runs are used as blueprints for creating new runs")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

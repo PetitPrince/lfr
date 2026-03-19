@@ -1,0 +1,49 @@
+{% if errors %}
+<article>
+    {% for error in errors %}
+    <p class="text-error">{{ error }}</p>
+    {% endfor %}
+</article>
+{% elif rows %}
+<article>
+    <header>
+        Preview: {{ valid_count }} valid, {{ error_count }} with errors
+    </header>
+
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Role</th>
+                <th>Character Name</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+            <tr>
+                <td>{{ row.row_number }}</td>
+                <td>{{ row.data.role }}</td>
+                <td>{{ row.data.character_name }}</td>
+                <td>
+                    {% if row.is_valid %}
+                    <span class="text-success">Valid</span>
+                    {% else %}
+                    {% for error in row.errors %}
+                    <small class="text-error">{{ error }}</small><br>
+                    {% endfor %}
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if valid_count > 0 %}
+    <form method="post" action="{% url 'dashboard:csv_upload_confirm' slug=run.slug %}">
+        {% csrf_token %}
+        <button type="submit">Create {{ valid_count }} casting(s)</button>
+    </form>
+    {% endif %}
+</article>
+{% endif %}

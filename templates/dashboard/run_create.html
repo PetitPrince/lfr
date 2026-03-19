@@ -1,0 +1,48 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Create Run{% endblock %}
+
+{% block content %}
+<h2>Create New Run</h2>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1em; margin-bottom: 2em;">
+    {% for tpl in templates %}
+    <article style="cursor: pointer;" onclick="selectTemplate({{ tpl.pk }}, '{{ tpl.name|escapejs }}')" id="tpl-{{ tpl.pk }}">
+        <header>New {{ tpl.name }} run</header>
+        <p>Pre-filled with {{ tpl.name }} houses, paths, years, and more</p>
+    </article>
+    {% endfor %}
+    <article style="cursor: pointer;" onclick="selectTemplate('', '')" id="tpl-blank">
+        <header>New Custom run</header>
+        <p>Start from scratch — set up houses, paths, and more later.</p>
+    </article>
+</div>
+
+<form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="template" id="template-input" value="">
+
+    {% for field in form %}
+    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+    {{ field }}
+    {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+    {% if field.errors %}
+    <small class="text-error">{{ field.errors.0 }}</small>
+    {% endif %}
+    {% endfor %}
+
+    <button type="submit">Create Run</button>
+    <a href="{% url 'dashboard:run_list' %}" role="button" class="outline secondary">Cancel</a>
+</form>
+
+<script>
+function selectTemplate(id, name) {
+    document.getElementById('template-input').value = id;
+    document.querySelectorAll('article[id^="tpl-"]').forEach(function(el) {
+        el.style.outline = '';
+    });
+    var target = id ? document.getElementById('tpl-' + id) : document.getElementById('tpl-blank');
+    if (target) target.style.outline = '2px solid var(--pico-primary)';
+}
+</script>
+{% endblock %}

@@ -1,0 +1,17 @@
+<tr>
+    <td colspan="6">
+        <article>
+            <p>Delete casting for <strong>{{ casting.character_name|default:"unnamed character" }}</strong>?</p>
+            <form hx-post="{% url 'dashboard:casting_delete' slug=run.slug casting_id=casting.pk %}"
+                  hx-target="body">
+                {% csrf_token %}
+                <button type="submit" class="contrast">Confirm Delete</button>
+                <button type="button" class="outline secondary"
+                        hx-get="{% url 'dashboard:casting_list' slug=run.slug %}"
+                        hx-target="body">
+                    Cancel
+                </button>
+            </form>
+        </article>
+    </td>
+</tr>

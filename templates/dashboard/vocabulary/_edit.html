@@ -1,0 +1,42 @@
+<form hx-post="{% url 'dashboard:vocabulary_edit' slug=run.slug vocab_type=vocab_type %}"
+      hx-target="#vocab-{{ vocab_type }}"
+      hx-swap="innerHTML">
+    {% csrf_token %}
+    <fieldset>
+        {% for item in items %}
+        <label>
+            <input type="checkbox" name="items" value="{{ item.pk }}"
+                   {% if item.pk in selected_ids %}checked{% endif %}>
+            {{ item.name }}
+        </label>
+        {% empty %}
+        <p class="text-muted">No items available. Add one below.</p>
+        {% endfor %}
+    </fieldset>
+
+    <div style="display: flex; gap: 0.5em; align-items: end; margin-bottom: 1em;">
+        <input type="text" name="name" placeholder="New {{ label|lower }} name..." style="margin:0"
+               hx-post="{% url 'dashboard:vocabulary_add' slug=run.slug vocab_type=vocab_type %}"
+               hx-target="#vocab-{{ vocab_type }}"
+               hx-swap="innerHTML"
+               hx-trigger="keydown[key=='Enter'] from:this"
+               hx-include="closest form">
+        <button type="button" class="outline"
+                hx-post="{% url 'dashboard:vocabulary_add' slug=run.slug vocab_type=vocab_type %}"
+                hx-target="#vocab-{{ vocab_type }}"
+                hx-swap="innerHTML"
+                hx-include="closest form"
+                style="white-space: nowrap;">
+            Add
+        </button>
+    </div>
+
+    <button type="submit">Save</button>
+    <button type="button" class="outline secondary"
+            hx-get="{% url 'dashboard:run_detail' slug=run.slug %}"
+            hx-select="#vocab-{{ vocab_type }}"
+            hx-target="#vocab-{{ vocab_type }}"
+            hx-swap="innerHTML">
+        Cancel
+    </button>
+</form>

@@ -1,0 +1,49 @@
+{% if custom_attributes %}
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Applies to</th>
+            <th>Filterable</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for attr in custom_attributes %}
+        <tr>
+            <td>{{ attr.name }}</td>
+            <td>{{ attr.get_attr_type_display }}</td>
+            <td>{{ attr.get_applies_to_display }}</td>
+            <td>{% if attr.is_filterable %}Yes{% else %}No{% endif %}</td>
+            <td>
+                <button class="outline secondary" style="padding:0.2em 0.6em; margin:0;"
+                        hx-post="{% url 'dashboard:custom_attr_delete' slug=run.slug attr_id=attr.pk %}"
+                        hx-target="#custom-attrs"
+                        hx-swap="innerHTML"
+                        hx-confirm="Delete custom attribute '{{ attr.name }}'?">
+                    Delete
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="text-muted">No custom attributes defined.</p>
+{% endif %}
+
+<details>
+    <summary>Add Custom Attribute</summary>
+    <form hx-post="{% url 'dashboard:custom_attrs' slug=run.slug %}"
+          hx-target="#custom-attrs"
+          hx-swap="innerHTML">
+        {% csrf_token %}
+        {% for field in form %}
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+        {% endfor %}
+        <button type="submit">Add Attribute</button>
+    </form>
+</details>

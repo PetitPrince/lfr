@@ -1,0 +1,5 @@
+{% for item in items %}
+<span class="chip">{{ item.name }}</span>
+{% empty %}
+<span class="text-muted">None configured</span>
+{% endfor %}

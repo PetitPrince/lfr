@@ -19,6 +19,16 @@ python manage.py runserver
 ```
 
 Admin UI: http://127.0.0.1:8000/admin/
+Organizer Dashboard: http://127.0.0.1:8000/organize/
+
+### Create an organizer account
+
+```bash
+uv run python manage.py shell -c "
+from accounts.models import User
+User.objects.create_user('organizer@test.com', 'testpass123', role='organizer')
+"
+```
 
 ## Run tests
 

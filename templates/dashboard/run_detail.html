@@ -1,0 +1,68 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}{{ run.name }}{% endblock %}
+
+{% block content %}
+<hgroup>
+    <h2>{{ run.name }}</h2>
+    <p>
+        {% if run.start_date %}{{ run.start_date }}{% endif %}
+        {% if run.end_date %} — {{ run.end_date }}{% endif %}
+        {% if run.is_active %}<ins>Active</ins>{% else %}<del>Inactive</del>{% endif %}
+    </p>
+</hgroup>
+
+{% if run.description %}
+<p>{{ run.description }}</p>
+{% endif %}
+
+<nav>
+    <ul>
+        <li><a href="{% url 'dashboard:run_settings' slug=run.slug %}" role="button" class="outline">Settings</a></li>
+        <li><a href="{% url 'dashboard:casting_list' slug=run.slug %}" role="button" class="outline">Castings ({{ casting_count }})</a></li>
+        <li><a href="{% url 'dashboard:invite_list' slug=run.slug %}" role="button" class="outline">Invites ({{ invite_count }})</a></li>
+    </ul>
+</nav>
+
+<details>
+    <summary>Quick Stats</summary>
+    <dl>
+        <dt>Total Castings</dt><dd>{{ casting_count }}</dd>
+        <dt>Claimed</dt><dd>{{ claimed_count }}</dd>
+        <dt>Invites Generated</dt><dd>{{ invite_count }}</dd>
+    </dl>
+</details>
+
+<hr>
+<h3>Run Setup</h3>
+
+{% for section in vocabulary_sections %}
+<article>
+    <header>
+        <strong>{{ section.label }}</strong>
+        <button class="outline secondary" style="float:right; padding:0.2em 0.6em; margin:0;"
+                hx-get="{% url 'dashboard:vocabulary_edit' slug=run.slug vocab_type=section.type %}"
+                hx-target="#vocab-{{ section.type }}"
+                hx-swap="innerHTML">
+            Edit
+        </button>
+    </header>
+    <div id="vocab-{{ section.type }}">
+        {% for item in section.items %}
+        <span class="chip">{{ item.name }}</span>
+        {% empty %}
+        <span class="text-muted">None configured</span>
+        {% endfor %}
+    </div>
+</article>
+{% endfor %}
+
+<hr>
+<h3>Custom Attributes</h3>
+<div id="custom-attrs"
+     hx-get="{% url 'dashboard:custom_attrs' slug=run.slug %}"
+     hx-trigger="load"
+     hx-swap="innerHTML">
+    Loading...
+</div>
+{% endblock %}

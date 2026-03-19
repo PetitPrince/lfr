@@ -1,0 +1,31 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}CSV Upload — {{ run.name }}{% endblock %}
+
+{% block content %}
+<h2>CSV Upload: {{ run.name }}</h2>
+<p><a href="{% url 'dashboard:casting_list' slug=run.slug %}">Back to castings</a></p>
+
+<article>
+    <header>Expected CSV format</header>
+    <p>Columns: <code>role, character_name, house, year, path, clubs, blood_status, teaching_subjects, monitor_of_house, monitor_of_club, staff_title</code></p>
+    <p>Required: <code>role</code>, <code>character_name</code>. Multi-value fields (clubs, teaching_subjects) use comma separation.</p>
+</article>
+
+<form hx-post="{% url 'dashboard:csv_upload_preview' slug=run.slug %}"
+      hx-target="#preview"
+      hx-swap="innerHTML"
+      hx-encoding="multipart/form-data">
+    {% csrf_token %}
+
+    <label for="id_csv_text">Paste CSV</label>
+    {{ form.csv_text }}
+
+    <label for="id_csv_file">Or upload a file</label>
+    {{ form.csv_file }}
+
+    <button type="submit">Preview</button>
+</form>
+
+<div id="preview"></div>
+{% endblock %}

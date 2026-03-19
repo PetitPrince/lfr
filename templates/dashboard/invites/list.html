@@ -1,0 +1,58 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Invites — {{ run.name }}{% endblock %}
+
+{% block content %}
+<hgroup>
+    <h2>Invites: {{ run.name }}</h2>
+    <p><a href="{% url 'dashboard:run_detail' slug=run.slug %}">Back to run</a></p>
+</hgroup>
+
+<form hx-post="{% url 'dashboard:invite_generate' slug=run.slug %}"
+      hx-target="#generated"
+      hx-swap="innerHTML">
+    {% csrf_token %}
+    <button type="submit">Generate Invite Codes</button>
+    <small>Creates codes for all castings that don't have one yet.</small>
+</form>
+
+<div id="generated"></div>
+
+{% if invites %}
+<table>
+    <thead>
+        <tr>
+            <th>Code</th>
+            <th>Character</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for invite in invites %}
+        <tr>
+            <td><code>{{ invite.code }}</code></td>
+            <td>{{ invite.casting.character_name|default:"—" }}</td>
+            <td>{{ invite.casting.get_role_display }}</td>
+            <td>
+                {% if invite.is_claimed %}
+                <span class="text-success">Claimed by {{ invite.casting.user.email }}</span>
+                {% else %}
+                <span class="text-muted">Unclaimed</span>
+                {% endif %}
+            </td>
+            <td>
+                <button class="outline" style="padding:0.2em 0.6em; margin:0;"
+                        onclick="copyToClipboard('{{ invite.code }}', this)">
+                    Copy
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="text-muted">No invite codes generated yet.</p>
+{% endif %}
+{% endblock %}

@@ -14,7 +14,7 @@ class Post(models.Model):
         OTHER = "other", "Other"
 
     run = models.ForeignKey("runs.Run", on_delete=models.CASCADE, related_name="posts")
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="posts")
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True, related_name="posts")
     casting = models.ForeignKey(
         "casting.Casting", on_delete=models.SET_NULL, null=True, blank=True, related_name="posts"
     )

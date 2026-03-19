@@ -1,0 +1,36 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}{% if is_edit %}Edit{% else %}New{% endif %} Casting — {{ run.name }}{% endblock %}
+
+{% block content %}
+<h2>{% if is_edit %}Edit Casting{% else %}New Casting{% endif %}: {{ run.name }}</h2>
+
+<form method="post">
+    {% csrf_token %}
+
+    {% for field in form %}
+    {% if field.name == "clubs" or field.name == "teaching_subjects" %}
+    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+    {{ field }}
+    {% elif field.html_name|truncatewords:1 == "custom_…" or field.name|slice:":7" == "custom_" %}
+    {% if field.field.widget.input_type == "checkbox" %}
+    <fieldset>
+        <label>{{ field }} {{ field.label }}</label>
+    </fieldset>
+    {% else %}
+    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+    {{ field }}
+    {% endif %}
+    {% else %}
+    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+    {{ field }}
+    {% endif %}
+    {% if field.errors %}
+    <small class="text-error">{{ field.errors.0 }}</small>
+    {% endif %}
+    {% endfor %}
+
+    <button type="submit">{% if is_edit %}Save{% else %}Create{% endif %}</button>
+    <a href="{% url 'dashboard:casting_list' slug=run.slug %}" role="button" class="outline secondary">Cancel</a>
+</form>
+{% endblock %}

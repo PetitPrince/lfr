@@ -1,0 +1,60 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Castings — {{ run.name }}{% endblock %}
+
+{% block content %}
+<hgroup>
+    <h2>Castings: {{ run.name }}</h2>
+    <p><a href="{% url 'dashboard:run_detail' slug=run.slug %}">Back to run</a></p>
+</hgroup>
+
+<nav>
+    <ul>
+        <li><a href="{% url 'dashboard:casting_create' slug=run.slug %}" role="button">New Casting</a></li>
+        <li><a href="{% url 'dashboard:csv_upload' slug=run.slug %}" role="button" class="outline">CSV Upload</a></li>
+    </ul>
+</nav>
+
+{% if castings %}
+<table>
+    <thead>
+        <tr>
+            <th>Character</th>
+            <th>Role</th>
+            <th>House</th>
+            <th>Year</th>
+            <th>Player</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for casting in castings %}
+        <tr>
+            <td>{{ casting.character_name|default:"—" }}</td>
+            <td>{{ casting.get_role_display }}</td>
+            <td>{{ casting.house|default:"—" }}</td>
+            <td>{{ casting.year|default:"—" }}</td>
+            <td>
+                {% if casting.user %}
+                {{ casting.user.email }}
+                {% else %}
+                <span class="text-muted">Unclaimed</span>
+                {% endif %}
+            </td>
+            <td>
+                <a href="{% url 'dashboard:casting_edit' slug=run.slug casting_id=casting.pk %}">Edit</a>
+                <button class="outline secondary" style="padding:0.2em 0.6em; margin:0;"
+                        hx-get="{% url 'dashboard:casting_delete' slug=run.slug casting_id=casting.pk %}"
+                        hx-target="closest tr"
+                        hx-swap="outerHTML">
+                    Delete
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="text-muted">No castings yet.</p>
+{% endif %}
+{% endblock %}

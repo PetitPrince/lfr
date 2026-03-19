@@ -1,0 +1,28 @@
+{% if new_invites %}
+<article>
+    <header>Newly generated codes</header>
+    <table>
+        <thead>
+            <tr>
+                <th>Code</th>
+                <th>Character</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for invite in new_invites %}
+            <tr>
+                <td><code>{{ invite.code }}</code></td>
+                <td>{{ invite.casting.character_name|default:"—" }}</td>
+                <td>
+                    <button class="outline" style="padding:0.2em 0.6em; margin:0;"
+                            onclick="copyToClipboard('{{ invite.code }}', this)">
+                        Copy
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</article>
+{% endif %}

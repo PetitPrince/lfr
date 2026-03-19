@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     "runs",
     "posts",
     "casting",
+    "dashboard",
 ]
 
 MIDDLEWARE = [
@@ -90,3 +91,6 @@ MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "accounts.User"
+
+LOGIN_URL = "/organize/login/"
+LOGIN_REDIRECT_URL = "/organize/"

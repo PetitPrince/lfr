@@ -1,0 +1,47 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Runs{% endblock %}
+
+{% block content %}
+<hgroup>
+    <h2>Your Runs</h2>
+    <p>Manage runs, castings, and invites</p>
+</hgroup>
+
+<a href="{% url 'dashboard:run_create' %}" role="button">Create New Run</a>
+
+{% if runs %}
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Dates</th>
+            <th>Status</th>
+            <th>Castings</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for run in runs %}
+        <tr>
+            <td><a href="{% url 'dashboard:run_detail' slug=run.slug %}">{{ run.name }}</a></td>
+            <td>
+                {% if run.start_date %}{{ run.start_date }}{% endif %}
+                {% if run.end_date %} — {{ run.end_date }}{% endif %}
+                {% if not run.start_date %}<span class="text-muted">No dates set</span>{% endif %}
+            </td>
+            <td>
+                {% if run.is_active %}
+                <ins>Active</ins>
+                {% else %}
+                <del>Inactive</del>
+                {% endif %}
+            </td>
+            <td>{{ run.castings.count }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="text-muted">No runs yet. Create one to get started.</p>
+{% endif %}
+{% endblock %}
