@@ -26,7 +26,7 @@ class Casting(models.Model):
     path = models.ForeignKey("runs.Path", on_delete=models.SET_NULL, null=True, blank=True)
     clubs = models.ManyToManyField("runs.Club", blank=True)
     blood_status = models.ForeignKey("runs.BloodStatus", on_delete=models.SET_NULL, null=True, blank=True)
-    teaching_subjects = models.ManyToManyField("runs.TeachingSubject", blank=True)
+    teaching_subject = models.ForeignKey("runs.TeachingSubject", on_delete=models.SET_NULL, null=True, blank=True)
     monitor_of_house = models.ForeignKey(
         "runs.House", on_delete=models.SET_NULL, null=True, blank=True, related_name="+"
     )

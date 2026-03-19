@@ -9,11 +9,11 @@ RUN_SCOPED_FK_FIELDS = {
     "blood_status": "blood_statuses",
     "monitor_of_house": "houses",
     "monitor_of_club": "clubs",
+    "teaching_subject": "teaching_subjects",
 }
 
 RUN_SCOPED_M2M_FIELDS = {
     "clubs": "clubs",
-    "teaching_subjects": "teaching_subjects",
 }
 
 

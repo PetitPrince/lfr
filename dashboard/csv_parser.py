@@ -25,7 +25,7 @@ class ParsedRow:
 # Expected CSV columns (all optional except role and character_name)
 EXPECTED_COLUMNS = {
     "role", "character_name", "house", "year", "path", "clubs",
-    "blood_status", "teaching_subjects", "monitor_of_house",
+    "blood_status", "teaching_subject", "monitor_of_house",
     "monitor_of_club", "staff_title",
 }
 
@@ -123,14 +123,12 @@ def parse_casting_csv(csv_text, run):
                     parsed.errors.append(f"Unknown club: '{c}'")
             data["clubs"] = club_list
 
-        # Teaching subjects (comma-separated)
-        subjects_str = row.get("teaching_subjects", "")
-        if subjects_str:
-            subject_list = [s.strip() for s in subjects_str.split(",") if s.strip()]
-            for s in subject_list:
-                if s not in subject_names:
-                    parsed.errors.append(f"Unknown teaching subject: '{s}'")
-            data["teaching_subjects"] = subject_list
+        # Teaching subject (single value)
+        subject = row.get("teaching_subject", "")
+        if subject:
+            if subject not in subject_names:
+                parsed.errors.append(f"Unknown teaching subject: '{subject}'")
+            data["teaching_subject"] = subject
 
         # Monitor of house
         monitor_house = row.get("monitor_of_house", "")

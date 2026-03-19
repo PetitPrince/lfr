@@ -5,7 +5,7 @@ from casting.models import Casting
 SHARED_FIELDS = ["role", "character_name"]
 
 STUDENT_FIELDS = ["house", "year", "path", "clubs", "blood_status"]
-PROFESSOR_FIELDS = ["teaching_subjects", "monitor_of_house", "monitor_of_club"]
+PROFESSOR_FIELDS = ["teaching_subject", "monitor_of_house", "monitor_of_club"]
 STAFF_FIELDS = ["staff_title"]
 
 ROLE_FIELDS = {
@@ -21,7 +21,7 @@ class CastingForm(forms.ModelForm):
         model = Casting
         fields = [
             "role", "character_name", "house", "year", "path",
-            "clubs", "blood_status", "teaching_subjects",
+            "clubs", "blood_status", "teaching_subject",
             "monitor_of_house", "monitor_of_club", "staff_title",
         ]
 
@@ -45,7 +45,7 @@ class CastingForm(forms.ModelForm):
             self.fields["path"].queryset = run.paths.all()
             self.fields["clubs"].queryset = run.clubs.all()
             self.fields["blood_status"].queryset = run.blood_statuses.all()
-            self.fields["teaching_subjects"].queryset = run.teaching_subjects.all()
+            self.fields["teaching_subject"].queryset = run.teaching_subjects.all()
             self.fields["monitor_of_house"].queryset = run.houses.all()
             self.fields["monitor_of_club"].queryset = run.clubs.all()
 

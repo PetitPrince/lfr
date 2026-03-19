@@ -185,9 +185,9 @@ class CSVUploadConfirmView(RunMixin, View):
             if data.get("clubs"):
                 clubs = self.run.clubs.filter(name__in=data["clubs"])
                 casting.clubs.set(clubs)
-            if data.get("teaching_subjects"):
-                subjects = self.run.teaching_subjects.filter(name__in=data["teaching_subjects"])
-                casting.teaching_subjects.set(subjects)
+            if data.get("teaching_subject"):
+                casting.teaching_subject = _lookup_vocab(self.run.teaching_subjects, data["teaching_subject"])
+                casting.save()
 
             created += 1
 
