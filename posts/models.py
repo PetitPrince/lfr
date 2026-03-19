@@ -15,8 +15,8 @@ class Post(models.Model):
 
     run = models.ForeignKey("runs.Run", on_delete=models.CASCADE, related_name="posts")
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="posts")
-    membership = models.ForeignKey(
-        "invites.RunMembership", on_delete=models.SET_NULL, null=True, blank=True, related_name="posts"
+    casting = models.ForeignKey(
+        "invites.Casting", on_delete=models.SET_NULL, null=True, blank=True, related_name="posts"
     )
     post_type = models.CharField(max_length=20, choices=PostType.choices)
 

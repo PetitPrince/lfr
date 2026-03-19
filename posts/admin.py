@@ -28,7 +28,7 @@ class PostAdmin(admin.ModelAdmin):
     list_display = ["__str__", "post_type", "run", "author", "is_published", "created_at"]
     list_filter = ["run", "post_type", "is_published"]
     search_fields = ["character_name", "title", "description"]
-    raw_id_fields = ["author", "membership"]
+    raw_id_fields = ["author", "casting"]
     inlines = [PostKeywordInline, LookingForEntryInline, RumorInline, PhotoInline]
 
 

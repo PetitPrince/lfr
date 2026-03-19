@@ -1,6 +1,73 @@
 from django.db import models
 
 
+class House(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    sort_order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["sort_order", "name"]
+
+    def __str__(self):
+        return self.name
+
+
+class Path(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    sort_order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["sort_order", "name"]
+
+    def __str__(self):
+        return self.name
+
+
+class Year(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    sort_order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["sort_order"]
+
+    def __str__(self):
+        return self.name
+
+
+class Club(models.Model):
+    name = models.CharField(max_length=200, unique=True)
+    sort_order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["sort_order", "name"]
+
+    def __str__(self):
+        return self.name
+
+
+class TeachingSubject(models.Model):
+    name = models.CharField(max_length=200, unique=True)
+    sort_order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["sort_order", "name"]
+
+    def __str__(self):
+        return self.name
+
+
+class BloodStatus(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    sort_order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["sort_order", "name"]
+        verbose_name_plural = "blood statuses"
+
+    def __str__(self):
+        return self.name
+
+
 class Run(models.Model):
     name = models.CharField(max_length=200)
     slug = models.SlugField(unique=True)
@@ -11,87 +78,15 @@ class Run(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    houses = models.ManyToManyField(House, blank=True, related_name="runs")
+    paths = models.ManyToManyField(Path, blank=True, related_name="runs")
+    years = models.ManyToManyField(Year, blank=True, related_name="runs")
+    clubs = models.ManyToManyField(Club, blank=True, related_name="runs")
+    teaching_subjects = models.ManyToManyField(TeachingSubject, blank=True, related_name="runs")
+    blood_statuses = models.ManyToManyField(BloodStatus, blank=True, related_name="runs")
+
     class Meta:
         ordering = ["-start_date"]
-
-    def __str__(self):
-        return self.name
-
-
-class House(models.Model):
-    run = models.ForeignKey(Run, on_delete=models.CASCADE, related_name="houses")
-    name = models.CharField(max_length=100)
-    sort_order = models.PositiveIntegerField(default=0)
-
-    class Meta:
-        ordering = ["sort_order", "name"]
-        unique_together = [("run", "name")]
-
-    def __str__(self):
-        return self.name
-
-
-class Path(models.Model):
-    run = models.ForeignKey(Run, on_delete=models.CASCADE, related_name="paths")
-    name = models.CharField(max_length=100)
-    sort_order = models.PositiveIntegerField(default=0)
-
-    class Meta:
-        ordering = ["sort_order", "name"]
-        unique_together = [("run", "name")]
-
-    def __str__(self):
-        return self.name
-
-
-class Year(models.Model):
-    run = models.ForeignKey(Run, on_delete=models.CASCADE, related_name="years")
-    name = models.CharField(max_length=100)
-    sort_order = models.PositiveIntegerField(default=0)
-
-    class Meta:
-        ordering = ["sort_order"]
-        unique_together = [("run", "name")]
-
-    def __str__(self):
-        return self.name
-
-
-class Club(models.Model):
-    run = models.ForeignKey(Run, on_delete=models.CASCADE, related_name="clubs")
-    name = models.CharField(max_length=200)
-    sort_order = models.PositiveIntegerField(default=0)
-
-    class Meta:
-        ordering = ["sort_order", "name"]
-        unique_together = [("run", "name")]
-
-    def __str__(self):
-        return self.name
-
-
-class TeachingSubject(models.Model):
-    run = models.ForeignKey(Run, on_delete=models.CASCADE, related_name="teaching_subjects")
-    name = models.CharField(max_length=200)
-    sort_order = models.PositiveIntegerField(default=0)
-
-    class Meta:
-        ordering = ["sort_order", "name"]
-        unique_together = [("run", "name")]
-
-    def __str__(self):
-        return self.name
-
-
-class BloodStatus(models.Model):
-    run = models.ForeignKey(Run, on_delete=models.CASCADE, related_name="blood_statuses")
-    name = models.CharField(max_length=100)
-    sort_order = models.PositiveIntegerField(default=0)
-
-    class Meta:
-        ordering = ["sort_order", "name"]
-        unique_together = [("run", "name")]
-        verbose_name_plural = "blood statuses"
 
     def __str__(self):
         return self.name
