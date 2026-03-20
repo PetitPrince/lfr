@@ -117,13 +117,6 @@ class SocialLoginButtonTests(TestCase):
         self.assertIn("Discord", content)
         self.assertIn("Facebook", content)
 
-    def test_landing_page_has_social_buttons(self):
-        response = self.client.get(reverse("landing"))
-        content = response.content.decode()
-        self.assertIn("Google", content)
-        self.assertIn("Discord", content)
-        self.assertIn("Facebook", content)
-
     def test_dashboard_login_has_no_social_buttons(self):
         response = self.client.get(reverse("dashboard:login"))
         content = response.content.decode()
@@ -317,6 +310,34 @@ class JoinViewTests(TestCase):
             response = self.client.post(self.join_url)
         # Should not crash — friendly error
         self.assertIn(response.status_code, [200, 302])
+
+
+class LandingPageInviteOnlyTests(TestCase):
+    def test_landing_has_no_signup_button(self):
+        response = self.client.get(reverse("landing"))
+        content = response.content.decode()
+        self.assertNotIn("Sign up", content)
+
+    def test_landing_has_no_social_buttons(self):
+        response = self.client.get(reverse("landing"))
+        content = response.content.decode()
+        self.assertNotIn("provider_login_url", content)
+
+    def test_landing_has_login_button(self):
+        response = self.client.get(reverse("landing"))
+        self.assertContains(response, "Log in")
+
+    def test_landing_mentions_invite(self):
+        response = self.client.get(reverse("landing"))
+        self.assertContains(response, "invite")
+
+
+class LoginPageInviteOnlyTests(TestCase):
+    def test_login_page_has_no_signup_link(self):
+        response = self.client.get(reverse("accounts:login"))
+        content = response.content.decode()
+        self.assertNotIn("Sign up", content)
+        self.assertNotIn("Don't have an account?", content)
 
 
 class SignupRemovedTests(TestCase):

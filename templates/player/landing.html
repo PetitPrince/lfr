@@ -53,16 +53,10 @@
             <h1>LFR</h1>
             <p class="subtitle">Looking for Relation — find your pre-game connections</p>
             <p>Discover fellow players, share character introductions, and build relationships before the LARP begins.</p>
-            {% load socialaccount %}
             <div class="actions">
                 <a href="{% url 'accounts:login' %}" role="button">Log in</a>
             </div>
-            <p style="opacity:0.7; font-size:0.9em; margin-top:1em;">Or continue with</p>
-            <div class="actions">
-                <a href="{% provider_login_url 'google' %}" role="button" class="outline" style="font-size:0.9em;">Google</a>
-                <a href="{% provider_login_url 'discord' %}" role="button" class="outline" style="font-size:0.9em;">Discord</a>
-                <a href="{% provider_login_url 'facebook' %}" role="button" class="outline" style="font-size:0.9em;">Facebook</a>
-            </div>
+            <p style="opacity:0.7; font-size:0.9em; margin-top:1em;">Got an invite link? Use it to join your run.</p>
         </div>
 
         <div class="steps">
