@@ -12,11 +12,11 @@
         <tbody>
             {% for invite in new_invites %}
             <tr>
-                <td><code>{{ invite.code }}</code></td>
+                <td><code>/{{ invite.casting.run.slug }}/join/{{ invite.code }}/</code></td>
                 <td>{{ invite.casting.character_name|default:"—" }}</td>
                 <td>
                     <button class="outline" style="padding:0.2em 0.6em; margin:0;"
-                            onclick="copyToClipboard('{{ invite.code }}', this)">
+                            onclick="copyToClipboard('{{ request.scheme }}://{{ request.get_host }}/{{ invite.casting.run.slug }}/join/{{ invite.code }}/', this)">
                         Copy
                     </button>
                 </td>

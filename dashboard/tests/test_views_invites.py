@@ -19,6 +19,13 @@ class TestInviteListView:
         resp = organizer_client.get(f"/organize/{run.slug}/invites/")
         assert "No invite codes" in resp.content.decode()
 
+    def test_invite_list_shows_full_join_url(self, organizer_client, run):
+        casting = CastingFactory(run=run, character_name="Nadia")
+        invite = InviteFactory(casting=casting)
+        resp = organizer_client.get(f"/organize/{run.slug}/invites/")
+        expected_path = f"/{run.slug}/join/{invite.code}/"
+        assert expected_path in resp.content.decode()
+
 
 class TestInviteGenerateView:
     def test_generates_codes_for_unclaimed_castings(self, organizer_client, run):
