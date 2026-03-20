@@ -182,3 +182,14 @@ class SocialUserAccessTests(TestCase):
         self.client.login(email="social@test.com", password="testpass123")
         response = self.client.get(reverse("dashboard:run_list"))
         self.assertIn(response.status_code, [302, 403])
+
+
+class AllauthSignupBlockedTests(TestCase):
+    def test_allauth_signup_blocked(self):
+        adapter = LFRAccountAdapter()
+        self.assertFalse(adapter.is_open_for_signup(None))
+
+    def test_allauth_signup_url_rejected(self):
+        response = self.client.get("/accounts/social/account/signup/")
+        # allauth should redirect away or show closed message, not a signup form
+        self.assertNotEqual(response.status_code, 200)
