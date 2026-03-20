@@ -117,13 +117,6 @@ class SocialLoginButtonTests(TestCase):
         self.assertIn("Discord", content)
         self.assertIn("Facebook", content)
 
-    def test_signup_page_has_social_buttons(self):
-        response = self.client.get(reverse("accounts:signup"))
-        content = response.content.decode()
-        self.assertIn("Google", content)
-        self.assertIn("Discord", content)
-        self.assertIn("Facebook", content)
-
     def test_landing_page_has_social_buttons(self):
         response = self.client.get(reverse("landing"))
         content = response.content.decode()
@@ -169,12 +162,6 @@ class SocialLoginNextParameterTests(TestCase):
         response = self.client.get(reverse("accounts:login") + "?next=/accounts/claim/abc/")
         content = response.content.decode()
         self.assertIn("next=", content)
-
-    def test_signup_social_buttons_preserve_next(self):
-        response = self.client.get(reverse("accounts:signup") + "?next=/accounts/claim/abc/")
-        content = response.content.decode()
-        self.assertIn("next=", content)
-
 
 class SocialUserAccessTests(TestCase):
     def test_social_created_player_cannot_access_organizer_dashboard(self):
@@ -330,6 +317,12 @@ class JoinViewTests(TestCase):
             response = self.client.post(self.join_url)
         # Should not crash — friendly error
         self.assertIn(response.status_code, [200, 302])
+
+
+class SignupRemovedTests(TestCase):
+    def test_signup_url_returns_404(self):
+        response = self.client.get("/accounts/signup/")
+        self.assertEqual(response.status_code, 404)
 
 
 class AllauthSignupBlockedTests(TestCase):

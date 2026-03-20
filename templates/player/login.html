@@ -37,7 +37,6 @@
                 <a href="{% provider_login_url 'facebook' %}{% if request.GET.next %}?next={{ request.GET.next|urlencode }}{% endif %}" role="button" class="outline">Facebook</a>
             </div>
 
-            <p style="text-align:center">Don't have an account? <a href="{% url 'accounts:signup' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}">Sign up</a></p>
         </article>
     </main>
 </body>
