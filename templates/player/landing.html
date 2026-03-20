@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>LFR — Looking for Relation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <style>
+        .hero {
+            text-align: center;
+            padding: 8vh 1em 4vh;
+        }
+        .hero h1 {
+            font-size: 2.5em;
+            margin-bottom: 0.2em;
+        }
+        .hero .subtitle {
+            font-size: 1.2em;
+            opacity: 0.7;
+            margin-bottom: 2em;
+        }
+        .hero .actions {
+            display: flex;
+            gap: 1em;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5em;
+            margin: 3em 0;
+        }
+        .steps article {
+            text-align: center;
+        }
+        .steps .step-number {
+            display: inline-block;
+            width: 2em;
+            height: 2em;
+            line-height: 2em;
+            border-radius: 50%;
+            background: var(--pico-primary);
+            color: var(--pico-primary-inverse);
+            font-weight: bold;
+            margin-bottom: 0.5em;
+        }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <div class="hero">
+            <h1>LFR</h1>
+            <p class="subtitle">Looking for Relation — find your pre-game connections</p>
+            <p>Discover fellow players, share character introductions, and build relationships before the LARP begins.</p>
+            <div class="actions">
+                <a href="{% url 'accounts:login' %}" role="button">Log in</a>
+                <a href="{% url 'accounts:signup' %}" role="button" class="outline">Sign up</a>
+            </div>
+        </div>
+
+        <div class="steps">
+            <article>
+                <div class="step-number">1</div>
+                <h4>Get invited</h4>
+                <p>Receive an invite code from your organizer with your casting details.</p>
+            </article>
+            <article>
+                <div class="step-number">2</div>
+                <h4>Introduce your character</h4>
+                <p>Post your character's story, keywords, and what relationships you're looking for.</p>
+            </article>
+            <article>
+                <div class="step-number">3</div>
+                <h4>Find connections</h4>
+                <p>Browse other characters, discover potential friends, rivals, and allies before the game.</p>
+            </article>
+        </div>
+    </main>
+
+    <footer class="container">
+        <small style="opacity: 0.6;">LFR — a Witchards community tool</small>
+    </footer>
+</body>
+</html>
