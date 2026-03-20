@@ -82,6 +82,7 @@
             {% endif %}
             {% if user.is_authenticated %}
             <li><small>{{ user.email }}</small></li>
+            <li><a href="{% url 'accounts:profile' %}" class="outline" style="padding:0.3em 0.8em;margin:0">Profile</a></li>
             <li>
                 <form method="post" action="{% url 'accounts:logout' %}" style="margin:0">
                     {% csrf_token %}

@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views import View
 
-from accounts.forms import SignupForm
+from accounts.forms import ProfileForm, SignupForm
 from casting.models import Casting, Invite
 
 
@@ -28,6 +28,26 @@ class PlayerSignupView(View):
                 return redirect(next_url)
             return redirect("runs:run_list")
         return render(request, "player/signup.html", {"form": form})
+
+
+class ProfileView(View):
+    def get(self, request):
+        if not request.user.is_authenticated:
+            return redirect(f"/accounts/login/?next={request.path}")
+        form = ProfileForm(instance=request.user)
+        if not request.user.contact_email:
+            form.initial["contact_email"] = request.user.email
+        return render(request, "player/profile.html", {"form": form})
+
+    def post(self, request):
+        if not request.user.is_authenticated:
+            return redirect(f"/accounts/login/?next={request.path}")
+        form = ProfileForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Profile updated.")
+            return redirect("accounts:profile")
+        return render(request, "player/profile.html", {"form": form})
 
 
 class PlayerLoginView(LoginView):

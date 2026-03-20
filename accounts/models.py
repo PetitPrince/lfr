@@ -28,6 +28,10 @@ class User(AbstractUser):
     username = None
     email = models.EmailField("email address", unique=True)
     role = models.CharField(max_length=20, choices=Role.choices, default=Role.PLAYER)
+    contact_email = models.EmailField(max_length=254, blank=True)
+    discord_username = models.CharField(max_length=100, blank=True)
+    facebook_url = models.URLField(max_length=300, blank=True)
+    instagram_url = models.URLField(max_length=300, blank=True)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []

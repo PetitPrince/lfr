@@ -67,6 +67,17 @@
 </div>
 {% endif %}
 
+{% if post.author.contact_email or post.author.discord_username or post.author.facebook_url or post.author.instagram_url %}
+<div class="contact-links" style="margin:0.5em 0">
+    <small class="text-muted">
+        {% if post.author.contact_email %}&#x2709; <a href="mailto:{{ post.author.contact_email }}">{{ post.author.contact_email }}</a>{% endif %}
+        {% if post.author.discord_username %}{% if post.author.contact_email %} &middot; {% endif %}Discord: {{ post.author.discord_username }}{% endif %}
+        {% if post.author.facebook_url %}{% if post.author.contact_email or post.author.discord_username %} &middot; {% endif %}<a href="{{ post.author.facebook_url }}">Facebook</a>{% endif %}
+        {% if post.author.instagram_url %}{% if post.author.contact_email or post.author.discord_username or post.author.facebook_url %} &middot; {% endif %}<a href="{{ post.author.instagram_url }}">Instagram</a>{% endif %}
+    </small>
+</div>
+{% endif %}
+
 {% if post.photos.all %}
 <div class="photo-gallery" style="margin:0.5em 0">
     {% for photo in post.photos.all %}
