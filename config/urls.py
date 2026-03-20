@@ -8,7 +8,7 @@ urlpatterns = [
     path("organize/", include("dashboard.urls")),
     path("accounts/", include("accounts.urls")),
     path("runs/", include("runs.urls")),
-    path("r/", include("posts.urls")),
+    path("post/", include("posts.urls")),
     path("casting/", include("casting.urls")),
 ]
 

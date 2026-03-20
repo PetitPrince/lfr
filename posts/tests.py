@@ -194,7 +194,7 @@ class TestPlayerClubEditing:
         user, casting = club_player
         clubs = list(club_run.clubs.all())
         resp = club_player_client.post(
-            f"/r/{club_run.slug}/create/",
+            f"/post/{club_run.slug}/create/",
             {
                 "post_type": "character",
                 "character_name": "Test Char",
@@ -210,7 +210,7 @@ class TestPlayerClubEditing:
     def test_create_post_with_no_clubs(self, club_run, club_player, club_player_client):
         user, casting = club_player
         resp = club_player_client.post(
-            f"/r/{club_run.slug}/create/",
+            f"/post/{club_run.slug}/create/",
             {
                 "post_type": "character",
                 "character_name": "Test Char",
@@ -229,7 +229,7 @@ class TestPlayerClubEditing:
         post = PostFactory(run=club_run, casting=casting, author=user)
 
         resp = club_player_client.post(
-            f"/r/{club_run.slug}/post/{post.pk}/edit/",
+            f"/post/{club_run.slug}/post/{post.pk}/edit/",
             {
                 "post_type": "character",
                 "character_name": "Test Char",
@@ -249,7 +249,7 @@ class TestPlayerClubEditing:
         post = PostFactory(run=club_run, casting=casting, author=user)
 
         resp = club_player_client.post(
-            f"/r/{club_run.slug}/post/{post.pk}/edit/",
+            f"/post/{club_run.slug}/post/{post.pk}/edit/",
             {
                 "post_type": "character",
                 "character_name": "Test Char",
@@ -268,7 +268,7 @@ class TestPlayerClubEditing:
         rogue_club = ClubFactory(name="Rogue Club")  # not in club_run
 
         resp = club_player_client.post(
-            f"/r/{club_run.slug}/create/",
+            f"/post/{club_run.slug}/create/",
             {
                 "post_type": "character",
                 "character_name": "Test Char",
@@ -288,7 +288,7 @@ class TestPlayerClubEditing:
         casting.clubs.set([clubs[0]])
         post = PostFactory(run=club_run, casting=casting, author=user)
 
-        resp = club_player_client.get(f"/r/{club_run.slug}/post/{post.pk}/edit/")
+        resp = club_player_client.get(f"/post/{club_run.slug}/post/{post.pk}/edit/")
         assert resp.status_code == 200
         content = resp.content.decode()
         # The selected club should have 'selected' attribute
