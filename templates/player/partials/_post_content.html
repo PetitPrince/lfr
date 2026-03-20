@@ -60,7 +60,7 @@
 
 {% if post.rumors.all %}
 <div style="margin:0.5em 0">
-    <strong>Rumors:</strong>
+    <strong>Rumors, Gossips and what people say about {{ post.casting.character_name }}:</strong>
     {% for rumor in post.rumors.all %}
     <div class="rumor">{{ rumor.text }}</div>
     {% endfor %}

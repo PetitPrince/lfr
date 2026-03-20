@@ -4,6 +4,7 @@ from django.test import Client
 
 from accounts.models import User
 from casting.models import Casting, Invite
+from posts.models import Post, PostKeyword
 from runs.models import (
     BloodStatus,
     Club,
@@ -116,6 +117,25 @@ class InviteFactory(factory.django.DjangoModelFactory):
         model = Invite
 
     casting = factory.SubFactory(CastingFactory)
+
+
+class PostFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Post
+
+    run = factory.SubFactory(RunFactory)
+    casting = factory.SubFactory(CastingFactory)
+    post_type = Post.PostType.CHARACTER
+    content = "A character post."
+    is_published = True
+
+
+class PostKeywordFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = PostKeyword
+
+    post = factory.SubFactory(PostFactory)
+    label = factory.Sequence(lambda n: f"keyword-{n}")
 
 
 class CustomAttributeDefinitionFactory(factory.django.DjangoModelFactory):

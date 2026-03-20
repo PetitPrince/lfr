@@ -384,14 +384,9 @@ class StudentFilterView(PlayerRunMixin, View):
 
 class StudentRandomView(PlayerRunMixin, View):
     def get(self, request, slug):
-        posts = Post.objects.filter(
-            run=self.run,
-            is_published=True,
-            post_type=Post.PostType.CHARACTER,
-            casting__role="student",
-        ).select_related(
-            "casting__house", "casting__year", "casting__path", "author",
-        ).prefetch_related("keywords").order_by("?")[:3]
+        from posts.hallway import get_biased_hallway_posts
+
+        posts = get_biased_hallway_posts(self.run, self.casting, count=3)
 
         return render(request, "player/partials/_hallway_widget.html", {
             "posts": posts,
