@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Complete Sign Up — LFR</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+</head>
+<body>
+    <main class="container" style="max-width: 400px; margin-top: 10vh;">
+        <article>
+            <header>
+                <h2>LFR — Complete Sign Up</h2>
+            </header>
+
+            <p>Your social account didn't provide an email address. Please enter one to finish signing up.</p>
+
+            {% if form.errors %}
+            {% for field, errors in form.errors.items %}
+            {% for error in errors %}
+            <p style="color: var(--pico-del-color);">{{ error }}</p>
+            {% endfor %}
+            {% endfor %}
+            {% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+                <label for="id_email">Email</label>
+                <input type="email" name="email" id="id_email" value="{{ form.email.value|default:'' }}" required autofocus>
+
+                <button type="submit">Complete sign up</button>
+            </form>
+        </article>
+    </main>
+</body>
+</html>

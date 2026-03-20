@@ -28,6 +28,15 @@
                 <button type="submit">Log in</button>
             </form>
 
+            {% load socialaccount %}
+            <hr>
+            <p style="text-align:center; opacity:0.7; font-size:0.9em;">Or continue with</p>
+            <div style="display:flex; flex-direction:column; gap:0.5em;">
+                <a href="{% provider_login_url 'google' %}{% if request.GET.next %}?next={{ request.GET.next|urlencode }}{% endif %}" role="button" class="outline">Google</a>
+                <a href="{% provider_login_url 'discord' %}{% if request.GET.next %}?next={{ request.GET.next|urlencode }}{% endif %}" role="button" class="outline">Discord</a>
+                <a href="{% provider_login_url 'facebook' %}{% if request.GET.next %}?next={{ request.GET.next|urlencode }}{% endif %}" role="button" class="outline">Facebook</a>
+            </div>
+
             <p style="text-align:center">Don't have an account? <a href="{% url 'accounts:signup' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}">Sign up</a></p>
         </article>
     </main>

@@ -1,6 +1,9 @@
+from unittest.mock import patch
+
 from django.test import TestCase, Client
 from django.urls import reverse
 
+from accounts.adapter import LFRAccountAdapter, LFRSocialAccountAdapter
 from accounts.models import User
 
 
@@ -104,3 +107,78 @@ class ContactLinksDisplayTests(TestCase):
         self.client.login(email="viewer@test.com", password="testpass123")
         response = self.client.get(reverse("posts:post_detail", kwargs={"slug": run.slug, "pk": post.pk}))
         self.assertNotContains(response, "contact-links")
+
+
+class SocialLoginButtonTests(TestCase):
+    def test_login_page_has_social_buttons(self):
+        response = self.client.get(reverse("accounts:login"))
+        content = response.content.decode()
+        self.assertIn("Google", content)
+        self.assertIn("Discord", content)
+        self.assertIn("Facebook", content)
+
+    def test_signup_page_has_social_buttons(self):
+        response = self.client.get(reverse("accounts:signup"))
+        content = response.content.decode()
+        self.assertIn("Google", content)
+        self.assertIn("Discord", content)
+        self.assertIn("Facebook", content)
+
+    def test_landing_page_has_social_buttons(self):
+        response = self.client.get(reverse("landing"))
+        content = response.content.decode()
+        self.assertIn("Google", content)
+        self.assertIn("Discord", content)
+        self.assertIn("Facebook", content)
+
+    def test_dashboard_login_has_no_social_buttons(self):
+        response = self.client.get(reverse("dashboard:login"))
+        content = response.content.decode()
+        self.assertNotIn("provider_login_url", content)
+        self.assertNotIn("socialaccount", content)
+
+
+class SocialAccountAdapterTests(TestCase):
+    def test_save_user_sets_role_player(self):
+        adapter = LFRSocialAccountAdapter()
+        saved_user = User.objects.create_user(email="social@test.com", password="testpass123")
+
+        with patch.object(
+            LFRSocialAccountAdapter.__bases__[0], "save_user", return_value=saved_user
+        ):
+            user = adapter.save_user(None, None, form=None)
+        self.assertEqual(user.role, "player")
+
+    def test_is_auto_signup_allowed(self):
+        adapter = LFRSocialAccountAdapter()
+        self.assertTrue(adapter.is_auto_signup_allowed(None, None))
+
+
+class AccountAdapterRedirectTests(TestCase):
+    def test_login_redirect(self):
+        adapter = LFRAccountAdapter()
+        self.assertEqual(adapter.get_login_redirect_url(None), "/runs/")
+
+    def test_signup_redirect(self):
+        adapter = LFRAccountAdapter()
+        self.assertEqual(adapter.get_signup_redirect_url(None), "/runs/")
+
+
+class SocialLoginNextParameterTests(TestCase):
+    def test_login_social_buttons_preserve_next(self):
+        response = self.client.get(reverse("accounts:login") + "?next=/accounts/claim/abc/")
+        content = response.content.decode()
+        self.assertIn("next=", content)
+
+    def test_signup_social_buttons_preserve_next(self):
+        response = self.client.get(reverse("accounts:signup") + "?next=/accounts/claim/abc/")
+        content = response.content.decode()
+        self.assertIn("next=", content)
+
+
+class SocialUserAccessTests(TestCase):
+    def test_social_created_player_cannot_access_organizer_dashboard(self):
+        user = User.objects.create_user(email="social@test.com", password="testpass123", role="player")
+        self.client.login(email="social@test.com", password="testpass123")
+        response = self.client.get(reverse("dashboard:run_list"))
+        self.assertIn(response.status_code, [302, 403])

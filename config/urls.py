@@ -15,6 +15,7 @@ urlpatterns = [
     path("", landing, name="landing"),
     path("admin/", admin.site.urls),
     path("organize/", include("dashboard.urls")),
+    path("accounts/social/", include("allauth.urls")),
     path("accounts/", include("accounts.urls")),
     path("runs/", include("runs.urls")),
     path("post/", include("posts.urls")),
