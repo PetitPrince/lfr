@@ -149,3 +149,9 @@ SOCIALACCOUNT_PROVIDERS = {
         },
     },
 }
+
+# Local settings override — not checked into git
+try:
+    from config.local_settings import *  # noqa: F401, F403
+except ImportError:
+    pass
