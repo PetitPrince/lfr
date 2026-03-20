@@ -10,7 +10,7 @@ class ProfileForm(forms.ModelForm):
         fields = ["contact_email", "discord_username", "facebook_url", "instagram_url"]
 
 
-class SignupForm(forms.ModelForm):
+class JoinSignupForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
     password_confirm = forms.CharField(widget=forms.PasswordInput, label="Confirm password")
 

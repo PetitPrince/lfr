@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views import View
 
-from accounts.forms import ProfileForm, SignupForm
+from accounts.forms import ProfileForm, JoinSignupForm
 from casting.models import Casting, Invite
 
 
@@ -13,13 +13,13 @@ class PlayerSignupView(View):
     def get(self, request):
         if request.user.is_authenticated:
             return redirect("runs:run_list")
-        form = SignupForm()
+        form = JoinSignupForm()
         return render(request, "player/signup.html", {"form": form})
 
     def post(self, request):
         if request.user.is_authenticated:
             return redirect("runs:run_list")
-        form = SignupForm(request.POST)
+        form = JoinSignupForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)
