@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Join {{ casting.run.name }} — LFR</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+</head>
+<body>
+    <main class="container" style="max-width: 500px; margin-top: 6vh;">
+        <article>
+            <header>
+                <h2>Join {{ casting.run.name }}</h2>
+            </header>
+
+            {% if error %}
+            <p style="color: var(--pico-del-color);">{{ error }}</p>
+            {% endif %}
+
+            {# --- Casting details --- #}
+            <table>
+                <tr><th>Character Name</th><td>{{ casting.character_name }}</td></tr>
+                <tr><th>Role</th><td>{{ casting.get_role_display }}</td></tr>
+                {% if casting.house %}<tr><th>House</th><td>{{ casting.house }}</td></tr>{% endif %}
+                {% if casting.year %}<tr><th>Year</th><td>{{ casting.year }}</td></tr>{% endif %}
+                {% if casting.path %}<tr><th>Path</th><td>{{ casting.path }}</td></tr>{% endif %}
+                {% if casting.blood_status %}<tr><th>Blood Status</th><td>{{ casting.blood_status }}</td></tr>{% endif %}
+                {% if casting.teaching_subject %}<tr><th>Teaching Subject</th><td>{{ casting.teaching_subject }}</td></tr>{% endif %}
+                {% if casting.staff_title %}<tr><th>Title</th><td>{{ casting.staff_title }}</td></tr>{% endif %}
+            </table>
+
+            {% if not error %}
+                {% if user.is_authenticated %}
+                {# --- Authenticated: confirm --- #}
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit">Join as {{ casting.character_name }}</button>
+                </form>
+
+                {% else %}
+                {# --- Unauthenticated: signup form + social + login link --- #}
+                <hr>
+                <h3>Create an account to join</h3>
+
+                {% if form.errors %}
+                {% for field, errors in form.errors.items %}
+                {% for err in errors %}
+                <p style="color: var(--pico-del-color);">{{ err }}</p>
+                {% endfor %}
+                {% endfor %}
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+                    <label for="id_email">Email</label>
+                    <input type="email" name="email" id="id_email" value="{{ form.email.value|default:'' }}" required autofocus>
+
+                    <label for="id_password">Password</label>
+                    <input type="password" name="password" id="id_password" required>
+
+                    <label for="id_password_confirm">Confirm Password</label>
+                    <input type="password" name="password_confirm" id="id_password_confirm" required>
+
+                    <button type="submit">Sign up</button>
+                </form>
+
+                {% load socialaccount %}
+                <hr>
+                <p style="text-align:center; opacity:0.7; font-size:0.9em;">Or continue with</p>
+                <div style="display:flex; flex-direction:column; gap:0.5em;">
+                    <a href="{% provider_login_url 'google' next=request.path %}" role="button" class="outline">Google</a>
+                    <a href="{% provider_login_url 'discord' next=request.path %}" role="button" class="outline">Discord</a>
+                    <a href="{% provider_login_url 'facebook' next=request.path %}" role="button" class="outline">Facebook</a>
+                </div>
+
+                <p style="text-align:center; margin-top:1em;">Already have an account? <a href="/accounts/login/?next={{ request.path|urlencode }}">Log in</a></p>
+                {% endif %}
+            {% endif %}
+        </article>
+    </main>
+</body>
+</html>

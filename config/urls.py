@@ -4,6 +4,8 @@ from django.contrib import admin
 from django.shortcuts import redirect, render
 from django.urls import include, path
 
+from accounts.views import JoinView
+
 
 def landing(request):
     if request.user.is_authenticated:
@@ -20,6 +22,7 @@ urlpatterns = [
     path("runs/", include("runs.urls")),
     path("post/", include("posts.urls")),
     path("casting/", include("casting.urls")),
+    path("<slug:slug>/join/<uuid:code>/", JoinView.as_view(), name="join"),
 ]
 
 if settings.DEBUG:

@@ -184,6 +184,154 @@ class SocialUserAccessTests(TestCase):
         self.assertIn(response.status_code, [302, 403])
 
 
+class JoinViewTests(TestCase):
+    def setUp(self):
+        from runs.models import Run
+        from casting.models import Casting, Invite
+
+        self.run = Run.objects.create(name="Test Run", slug="test-run", is_active=True)
+        self.casting = Casting.objects.create(
+            run=self.run, role="student", character_name="Nadia Kowalski"
+        )
+        self.invite = Invite.objects.create(casting=self.casting)
+        self.join_url = f"/{self.run.slug}/join/{self.invite.code}/"
+
+    # --- GET unauthenticated ---
+
+    def test_join_page_shows_casting_details_unauthenticated(self):
+        response = self.client.get(self.join_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Nadia Kowalski")
+        self.assertContains(response, "Test Run")
+
+    def test_join_page_shows_signup_form_unauthenticated(self):
+        response = self.client.get(self.join_url)
+        self.assertContains(response, 'name="email"')
+        self.assertContains(response, 'name="password"')
+        self.assertContains(response, 'name="password_confirm"')
+
+    def test_join_page_shows_social_buttons_unauthenticated(self):
+        response = self.client.get(self.join_url)
+        content = response.content.decode()
+        self.assertIn("Google", content)
+        self.assertIn("Discord", content)
+        self.assertIn("Facebook", content)
+
+    def test_join_page_social_buttons_preserve_next(self):
+        response = self.client.get(self.join_url)
+        content = response.content.decode()
+        self.assertIn("next=", content)
+
+    def test_join_page_shows_login_link_unauthenticated(self):
+        response = self.client.get(self.join_url)
+        self.assertContains(response, "Already have an account?")
+        self.assertContains(response, "/accounts/login/")
+
+    # --- GET authenticated ---
+
+    def test_join_page_shows_confirm_button_authenticated(self):
+        User.objects.create_user(email="p@test.com", password="testpass123")
+        self.client.login(email="p@test.com", password="testpass123")
+        response = self.client.get(self.join_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Nadia Kowalski")
+        self.assertContains(response, "Join as")
+
+    # --- POST signup (unauthenticated) ---
+
+    def test_signup_via_join_creates_player(self):
+        response = self.client.post(self.join_url, {
+            "email": "new@test.com",
+            "password": "testpass123",
+            "password_confirm": "testpass123",
+        })
+        self.assertEqual(response.status_code, 302)
+        user = User.objects.get(email="new@test.com")
+        self.assertEqual(user.role, "player")
+
+    def test_signup_via_join_redirects_back_to_join(self):
+        response = self.client.post(self.join_url, {
+            "email": "new@test.com",
+            "password": "testpass123",
+            "password_confirm": "testpass123",
+        })
+        self.assertRedirects(response, self.join_url, fetch_redirect_response=False)
+
+    def test_signup_via_join_logs_user_in(self):
+        self.client.post(self.join_url, {
+            "email": "new@test.com",
+            "password": "testpass123",
+            "password_confirm": "testpass123",
+        })
+        response = self.client.get(self.join_url)
+        # Now authenticated — should see confirm button, not signup form
+        self.assertContains(response, "Join as")
+        self.assertNotContains(response, 'name="password_confirm"')
+
+    # --- POST confirm (authenticated) ---
+
+    def test_confirm_claims_invite(self):
+        user = User.objects.create_user(email="p@test.com", password="testpass123")
+        self.client.login(email="p@test.com", password="testpass123")
+        response = self.client.post(self.join_url)
+        self.casting.refresh_from_db()
+        self.invite.refresh_from_db()
+        self.assertEqual(self.casting.user, user)
+        self.assertIsNotNone(self.invite.claimed_at)
+
+    def test_confirm_redirects_to_message_board(self):
+        User.objects.create_user(email="p@test.com", password="testpass123")
+        self.client.login(email="p@test.com", password="testpass123")
+        response = self.client.post(self.join_url)
+        self.assertRedirects(
+            response,
+            f"/post/{self.run.slug}/",
+            fetch_redirect_response=False,
+        )
+
+    # --- Validation ---
+
+    def test_already_claimed_shows_error(self):
+        other_user = User.objects.create_user(email="other@test.com", password="testpass123")
+        self.casting.user = other_user
+        self.casting.save()
+        response = self.client.get(self.join_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "already been claimed")
+
+    def test_already_in_run_shows_error(self):
+        from casting.models import Casting
+        user = User.objects.create_user(email="p@test.com", password="testpass123")
+        Casting.objects.create(run=self.run, user=user, character_name="Other Char")
+        self.client.login(email="p@test.com", password="testpass123")
+        response = self.client.get(self.join_url)
+        self.assertContains(response, "already have a character")
+
+    def test_wrong_run_slug_returns_404(self):
+        response = self.client.get(f"/wrong-slug/join/{self.invite.code}/")
+        self.assertEqual(response.status_code, 404)
+
+    def test_inactive_run_returns_404(self):
+        self.run.is_active = False
+        self.run.save()
+        response = self.client.get(self.join_url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_concurrent_confirm_handled_gracefully(self):
+        from unittest.mock import patch
+        from casting.models import Casting
+        user = User.objects.create_user(email="p@test.com", password="testpass123")
+        self.client.login(email="p@test.com", password="testpass123")
+        # Mock the exists() check to return False (simulating race: another tab claimed between check and save)
+        with patch.object(Casting.objects, "filter") as mock_filter:
+            mock_filter.return_value.exists.return_value = False
+            # But the save will hit the unique constraint because we link user to run right now
+            Casting.objects.create(run=self.run, user=user, character_name="Race Winner")
+            response = self.client.post(self.join_url)
+        # Should not crash — friendly error
+        self.assertIn(response.status_code, [200, 302])
+
+
 class AllauthSignupBlockedTests(TestCase):
     def test_allauth_signup_blocked(self):
         adapter = LFRAccountAdapter()
