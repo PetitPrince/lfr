@@ -6,6 +6,7 @@ from posts.models import Post
 class CharacterPostForm(forms.ModelForm):
     character_name = forms.CharField(max_length=300)
     blood_status = forms.ModelChoiceField(queryset=None, required=False)
+    clubs = forms.ModelMultipleChoiceField(queryset=None, required=False)
     keywords = forms.CharField(required=False, help_text="Comma-separated keywords")
     looking_for_labels = forms.CharField(required=False, widget=forms.HiddenInput)
     looking_for_descriptions = forms.CharField(required=False, widget=forms.HiddenInput)
@@ -24,9 +25,12 @@ class CharacterPostForm(forms.ModelForm):
             self.fields["character_name"].initial = casting.character_name
             self.fields["blood_status"].initial = casting.blood_status_id
             self.fields["blood_status"].queryset = casting.run.blood_statuses.all()
+            self.fields["clubs"].queryset = casting.run.clubs.all()
+            self.fields["clubs"].initial = casting.clubs.all()
         else:
-            from runs.models import BloodStatus
+            from runs.models import BloodStatus, Club
             self.fields["blood_status"].queryset = BloodStatus.objects.none()
+            self.fields["clubs"].queryset = Club.objects.none()
 
 
 class OtherPostForm(forms.ModelForm):

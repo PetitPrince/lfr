@@ -42,6 +42,13 @@
             <option value="{{ bs.pk }}" {% if form.blood_status.value|stringformat:"d" == bs.pk|stringformat:"d" %}selected{% endif %}>{{ bs }}</option>
             {% endfor %}
         </select>
+
+        <label for="id_clubs">Clubs</label>
+        <select name="clubs" id="id_clubs" multiple>
+            {% for club in form.fields.clubs.queryset %}
+            <option value="{{ club.pk }}" {% if club.pk in form.clubs.value or club in form.fields.clubs.initial %}selected{% endif %}>{{ club }}</option>
+            {% endfor %}
+        </select>
     {% endif %}
 
     {% if post_type == "other" %}

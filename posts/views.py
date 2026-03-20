@@ -427,6 +427,7 @@ def _save_casting_fields(form, casting):
     casting.character_name = form.cleaned_data["character_name"]
     casting.blood_status = form.cleaned_data["blood_status"]
     casting.save(update_fields=["character_name", "blood_status"])
+    casting.clubs.set(form.cleaned_data.get("clubs", []))
 
 def _build_comment_tree(comments):
     tree = []
