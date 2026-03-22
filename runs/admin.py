@@ -31,7 +31,7 @@ class RunAdmin(admin.ModelAdmin):
 
 @admin.register(House)
 class HouseAdmin(admin.ModelAdmin):
-    list_display = ["name", "sort_order"]
+    list_display = ["name", "color", "sort_order"]
     search_fields = ["name"]
 
 
@@ -43,7 +43,7 @@ class PathAdmin(admin.ModelAdmin):
 
 @admin.register(Year)
 class YearAdmin(admin.ModelAdmin):
-    list_display = ["name", "sort_order"]
+    list_display = ["name", "color", "sort_order"]
     search_fields = ["name"]
 
 

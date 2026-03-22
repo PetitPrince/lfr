@@ -3,6 +3,7 @@ from django.db import models
 
 class House(models.Model):
     name = models.CharField(max_length=100, unique=True)
+    color = models.CharField(max_length=7, blank=True, default="", help_text="Hex color code, e.g. #3B82F6")
     sort_order = models.PositiveIntegerField(default=0)
 
     class Meta:
@@ -25,6 +26,7 @@ class Path(models.Model):
 
 class Year(models.Model):
     name = models.CharField(max_length=100, unique=True)
+    color = models.CharField(max_length=7, blank=True, default="", help_text="Hex border color, e.g. #FFD700")
     sort_order = models.PositiveIntegerField(default=0)
 
     class Meta:

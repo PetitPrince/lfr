@@ -14,7 +14,7 @@
 
 <p>
     {% if character_post %}
-    <a href="{% url 'posts:post_edit' slug=run.slug pk=character_post.pk %}" role="button" class="outline">Edit Character Post</a>
+    <a href="{% url 'posts:post_edit' slug=run.slug pk=character_post.pk %}" role="button" class="outline">Edit My Character Post</a>
     {% endif %}
     {% if can_create_character %}
     <a href="{% url 'posts:post_create' slug=run.slug %}?type=character" role="button" class="outline">New Character Post</a>

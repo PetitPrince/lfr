@@ -10,8 +10,8 @@
 <small class="text-muted">
     {% if post.post_type == "character" and post.casting %}
         <span class="badge">{{ post.casting.get_role_display }}</span>
-        {% if post.casting.house %}<a href="{% url 'posts:discover_students' slug=run.slug %}?house={{ post.casting.house.pk }}" class="badge">{{ post.casting.house }}</a>{% endif %}
-        {% if post.casting.year %}<a href="{% url 'posts:discover_students' slug=run.slug %}?year={{ post.casting.year.pk }}" class="badge">{{ post.casting.year }}</a>{% endif %}
+        {% if post.casting.house %}<a href="{% url 'posts:discover_students' slug=run.slug %}?house={{ post.casting.house.pk }}" class="badge"{% if post.casting.house.color %} style="background:{{ post.casting.house.color }}; color:#fff"{% endif %}>{{ post.casting.house }}</a>{% endif %}
+        {% if post.casting.year %}<a href="{% url 'posts:discover_students' slug=run.slug %}?year={{ post.casting.year.pk }}" class="badge"{% if post.casting.year.color %} style="border:2px solid {{ post.casting.year.color }}"{% endif %}>{{ post.casting.year }}</a>{% endif %}
         {% if post.casting.path %}<a href="{% url 'posts:discover_students' slug=run.slug %}?path={{ post.casting.path.pk }}" class="badge">{{ post.casting.path }}</a>{% endif %}
         {% if post.casting.blood_status %}<a href="{% url 'posts:discover_students' slug=run.slug %}?blood_status={{ post.casting.blood_status.pk }}" class="badge">{{ post.casting.blood_status }}</a>{% endif %}
         {% if post.casting.teaching_subject %}<span class="badge">Teaching: {{ post.casting.teaching_subject }}</span>{% endif %}

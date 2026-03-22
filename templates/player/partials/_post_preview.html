@@ -9,8 +9,8 @@
     <small class="text-muted">
         {% if post.post_type == "character" and post.casting %}
             <span class="badge">{{ post.casting.get_role_display }}</span>
-            {% if post.casting.house %}<span class="badge">{{ post.casting.house }}</span>{% endif %}
-            {% if post.casting.year %}<span class="badge">{{ post.casting.year }}</span>{% endif %}
+            {% if post.casting.house %}<span class="badge"{% if post.casting.house.color %} style="background:{{ post.casting.house.color }}; color:#fff"{% endif %}>{{ post.casting.house }}</span>{% endif %}
+            {% if post.casting.year %}<span class="badge"{% if post.casting.year.color %} style="border:2px solid {{ post.casting.year.color }}"{% endif %}>{{ post.casting.year }}</span>{% endif %}
         {% else %}
             <span class="badge">{{ post.get_category_display }}</span>
         {% endif %}
