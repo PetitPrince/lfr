@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth import get_user_model
+from django.contrib.auth.password_validation import validate_password
 
 User = get_user_model()
 
@@ -23,6 +24,8 @@ class JoinSignupForm(forms.ModelForm):
         p2 = self.cleaned_data.get("password_confirm")
         if p1 and p2 and p1 != p2:
             raise forms.ValidationError("Passwords do not match.")
+        if p1:
+            validate_password(p1)
         return p2
 
     def save(self, commit=True):

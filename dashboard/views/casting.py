@@ -132,7 +132,13 @@ class CSVUploadPreviewView(RunMixin, View):
 
         csv_text = form.cleaned_data.get("csv_text", "")
         if not csv_text and form.cleaned_data.get("csv_file"):
-            csv_text = form.cleaned_data["csv_file"].read().decode("utf-8-sig")
+            csv_file = form.cleaned_data["csv_file"]
+            if csv_file.size > 1 * 1024 * 1024:  # 1 MB
+                return render(request, "dashboard/casting/_upload_preview.html", {
+                    "run": self.run,
+                    "errors": ["CSV file is too large (max 1 MB)."],
+                })
+            csv_text = csv_file.read().decode("utf-8-sig")
 
         if not csv_text.strip():
             return render(request, "dashboard/casting/_upload_preview.html", {

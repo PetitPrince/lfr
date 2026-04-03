@@ -1,27 +1,25 @@
 from django.contrib import messages
 from django.contrib.auth import login
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.db import IntegrityError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views import View
 
 from accounts.forms import JoinSignupForm, ProfileForm
 from casting.models import Casting, Invite
 
 
-class ProfileView(View):
+class ProfileView(LoginRequiredMixin, View):
     def get(self, request):
-        if not request.user.is_authenticated:
-            return redirect(f"/accounts/login/?next={request.path}")
         form = ProfileForm(instance=request.user)
         if not request.user.contact_email:
             form.initial["contact_email"] = request.user.email
         return render(request, "player/profile.html", {"form": form})
 
     def post(self, request):
-        if not request.user.is_authenticated:
-            return redirect(f"/accounts/login/?next={request.path}")
         form = ProfileForm(request.POST, instance=request.user)
         if form.is_valid():
             form.save()
@@ -35,7 +33,10 @@ class PlayerLoginView(LoginView):
     redirect_authenticated_user = True
 
     def get_default_redirect_url(self):
-        return self.request.GET.get("next", "/runs/")
+        next_url = self.request.GET.get("next", "")
+        if next_url and url_has_allowed_host_and_scheme(next_url, allowed_hosts={self.request.get_host()}):
+            return next_url
+        return "/runs/"
 
 
 class PlayerLogoutView(LogoutView):
@@ -93,14 +94,16 @@ class JoinView(View):
             context["form"] = form
             return render(request, "player/join.html", context)
 
-        # Confirm flow (authenticated)
+        # Confirm flow (authenticated) — atomic update prevents race condition
         if Casting.objects.filter(user=request.user, run=casting.run).exists():
             context["error"] = "You already have a character in this run."
             return render(request, "player/join.html", context)
 
         try:
-            casting.user = request.user
-            casting.save()
+            updated = Casting.objects.filter(pk=casting.pk, user__isnull=True).update(user=request.user)
+            if not updated:
+                context["error"] = "This invite has already been claimed."
+                return render(request, "player/join.html", context)
         except IntegrityError:
             context["error"] = "You already have a character in this run."
             return render(request, "player/join.html", context)

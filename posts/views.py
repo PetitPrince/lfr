@@ -19,7 +19,7 @@ class MessageBoardView(PlayerRunMixin, View):
         posts = (
             Post.objects.filter(run=self.run, is_published=True)
             .select_related("casting__house", "casting__year", "casting__path", "author")
-            .prefetch_related("keywords", "photos")
+            .prefetch_related("keywords", "photos", "casting__clubs")
             .order_by("-created_at")
         )
         paginator = Paginator(posts, 20)
@@ -473,8 +473,21 @@ def _save_rumors(request, post):
             Rumor.objects.create(post=post, text=text, sort_order=i)
 
 
+ALLOWED_PHOTO_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
+MAX_PHOTO_SIZE = 10 * 1024 * 1024  # 10 MB
+MAX_PHOTOS_PER_POST = 20
+
+
 def _save_photos(request, post):
     files = request.FILES.getlist("photos")
     existing_count = post.photos.count()
-    for i, f in enumerate(files):
+    remaining_slots = MAX_PHOTOS_PER_POST - existing_count
+    for i, f in enumerate(files[:remaining_slots]):
+        ext = "." + f.name.rsplit(".", 1)[-1].lower() if "." in f.name else ""
+        if ext not in ALLOWED_PHOTO_EXTENSIONS:
+            messages.warning(request, f"Skipped {f.name}: only JPEG, PNG, GIF, and WebP are allowed.")
+            continue
+        if f.size > MAX_PHOTO_SIZE:
+            messages.warning(request, f"Skipped {f.name}: file exceeds 10 MB limit.")
+            continue
         Photo.objects.create(post=post, image=f, sort_order=existing_count + i)

@@ -1,6 +1,5 @@
 from django.http import JsonResponse
 
-from casting.mixins import PlayerRequiredMixin
 from runs.models import GlobalKeyword, GlobalLookingForLabel
 
 

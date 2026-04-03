@@ -10,9 +10,15 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = "django-insecure--5q%xmhrr^*rp&0i0v(2%nzi_@ky^9j0q!*&!1%wbs^1a@yoqs"
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "")
+if not SECRET_KEY:
+    # Allow insecure key only when DEBUG is explicitly set
+    if os.environ.get("DEBUG", "True").lower() in ("true", "1", "yes"):
+        SECRET_KEY = "django-insecure-dev-only-key-do-not-use-in-production"
+    else:
+        raise RuntimeError("DJANGO_SECRET_KEY environment variable is required in production.")
 
-DEBUG = True
+DEBUG = os.environ.get("DEBUG", "True").lower() in ("true", "1", "yes")
 
 ALLOWED_HOSTS = []
 
