@@ -276,6 +276,42 @@ Feed cards and detail views display photos in a tiled grid rather than a single 
 - **Target browsers:** last 2 versions of Chrome, Firefox, Safari, Edge. No IE11 support.
 - Tom Select: add minimal CSS overrides in `player.css` to match input styling (border color, border-radius, font family)
 
+## Dark Mode
+
+A "candlelit study" dark mode — same warm palette inverted, not a generic cold dark theme. Toggled via `prefers-color-scheme: dark` media query (follows OS setting). No manual toggle in v1.
+
+### Dark Palette (CSS custom property overrides)
+
+| Token | Light | Dark | Notes |
+|---|---|---|---|
+| `--parchment-light` | `#f5e6c8` | `#1e1a14` | Deep warm brown, not pure black |
+| `--parchment-dark` | `#e8d5a8` | `#252015` | Gradient end |
+| `--ink` | `#2c1810` | `#e8d5a8` | Parchment-toned text, not pure white |
+| `--ink-light` | `#5c3d2e` | `#c4a265` | Warmer secondary text |
+| `--gold` | `#d4a547` | `#d4a547` | Unchanged — already pops on dark |
+| `--gold-muted` | `#c4a265` | `#5a4a30` | Muted borders, less prominent |
+| `--gold-dark` | `#6b5311` | `#d4a547` | Links brighter on dark bg |
+| `--brown-dark` | `#3d2b1f` | `#1a1410` | Nav background deepens |
+| `--brown-mid` | `#5c3d2e` | `#2a2018` | Nav gradient end |
+| `--brown-muted` | `#8b6f4e` | `#8b6f3a` | Slightly warmer muted |
+| `--card-bg` | `rgba(255,255,255,0.45)` | `rgba(255,255,255,0.06)` | Very subtle lift |
+| `--card-bg-hover` | `rgba(255,255,255,0.55)` | `rgba(255,255,255,0.10)` | Subtle hover |
+| `--error` | `#8b3a3a` | `#d46a6a` | Brighter on dark |
+| `--success` | `#3a6b3a` | `#6ad46a` | Brighter on dark |
+
+### Implementation
+
+All dark mode values are CSS custom property overrides inside a `@media (prefers-color-scheme: dark)` block in `player.css`. No separate stylesheet, no JS toggle. Components use the same CSS property names — only the values change.
+
+### Key Adaptations
+
+- **Primary button inverts:** gold background (`--gold`) with dark text (`--parchment-light`) instead of dark bg with gold text. Stands out better on dark surfaces.
+- **Nav border:** uses `--gold-muted` (the muted dark value `#8b6f3a`), subtler than light mode.
+- **House badges:** keep house background color, but text becomes `--parchment-dark` (light) for readability on dark page.
+- **Photo placeholders:** gradient backgrounds darken further; SVG strokes use muted gold.
+- **"+N more" overlay:** darker overlay (`rgba(30,26,20,0.65)`) with gold text.
+- **Chip backgrounds:** `rgba(139,111,58,0.25)` — warm-tinted translucent instead of light-tinted.
+
 ## What Stays the Same
 
 - HTMX interactions (expand posts, filter submission, comment threading, autocomplete)
@@ -288,6 +324,6 @@ Feed cards and detail views display photos in a tiled grid rather than a single 
 
 - Player-configurable feed preview mode (rumor/looking-for/bio) — noted for future, not implemented in this pass. Default to rumor with looking-for fallback.
 - Player-configurable detail section order — noted for future. Default to bio first.
-- Dark mode
+- Manual dark mode toggle (v1 follows OS `prefers-color-scheme` only)
 - Animations beyond simple hover transitions
 - Mobile-specific hamburger menu (nav wraps naturally)
