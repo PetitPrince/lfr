@@ -355,3 +355,78 @@ class AllauthSignupBlockedTests(TestCase):
         response = self.client.get("/accounts/social/account/signup/")
         # allauth should redirect away or show closed message, not a signup form
         self.assertNotEqual(response.status_code, 200)
+
+
+# ── Security Tests (pytest-style) ──
+
+import pytest
+from conftest import CastingFactory, InviteFactory, RunFactory, UserFactory
+
+
+class TestOpenRedirectPrevention:
+    """Login view must not redirect to external URLs."""
+
+    @pytest.fixture
+    def login_user(self, db):
+        return UserFactory(email="redirect@test.com")
+
+    def _login(self, client, next_url):
+        return client.post(
+            f"/accounts/login/?next={next_url}",
+            {"username": "redirect@test.com", "password": "testpass123"},
+        )
+
+    def test_safe_next_url_works(self, client, login_user):
+        resp = self._login(client, "/runs/")
+        assert resp.status_code == 302
+        assert resp.url == "/runs/"
+
+    def test_external_https_url_blocked(self, client, login_user):
+        resp = self._login(client, "https://evil.com")
+        assert resp.status_code == 302
+        assert "evil.com" not in resp.url
+        assert resp.url == "/runs/"
+
+    def test_protocol_relative_url_blocked(self, client, login_user):
+        resp = self._login(client, "//evil.com")
+        assert resp.status_code == 302
+        assert "evil.com" not in resp.url
+        assert resp.url == "/runs/"
+
+
+class TestPasswordValidation:
+    """JoinView signup rejects weak passwords."""
+
+    @pytest.fixture
+    def join_context(self, db):
+        run = RunFactory(name="PW Run", slug="pw-run", is_active=True)
+        casting = CastingFactory(run=run, character_name="Test Char")
+        invite = InviteFactory(casting=casting)
+        return run, invite
+
+    def test_weak_password_rejected(self, client, join_context):
+        run, invite = join_context
+        resp = client.post(
+            f"/{run.slug}/join/{invite.code}/",
+            {
+                "email": "weak@test.com",
+                "password": "123",
+                "password_confirm": "123",
+            },
+        )
+        # Should re-render the form (200), not redirect (302)
+        assert resp.status_code == 200
+        assert not User.objects.filter(email="weak@test.com").exists()
+
+    def test_valid_password_succeeds(self, client, join_context):
+        run, invite = join_context
+        resp = client.post(
+            f"/{run.slug}/join/{invite.code}/",
+            {
+                "email": "strong@test.com",
+                "password": "V3ryStr0ng!Pass",
+                "password_confirm": "V3ryStr0ng!Pass",
+            },
+        )
+        assert resp.status_code == 302
+        assert User.objects.filter(email="strong@test.com").exists()

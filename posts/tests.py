@@ -293,3 +293,287 @@ class TestPlayerClubEditing:
         content = resp.content.decode()
         # The selected club should have 'selected' attribute
         assert f'value="{clubs[0].pk}" selected' in content or f"value=\"{clubs[0].pk}\" selected" in content
+
+
+# ── Player View Tests ──
+
+from posts.models import Comment, Photo, Post
+
+
+@pytest.fixture
+def casting(run, player):
+    """A casting linking the player to the run."""
+    return CastingFactory(run=run, user=player, role="student", character_name="Nadia Kowalski")
+
+
+@pytest.fixture
+def other_user(db):
+    return UserFactory(email="other@test.com", role="player")
+
+
+@pytest.fixture
+def other_casting(run, other_user):
+    return CastingFactory(run=run, user=other_user, role="student", character_name="Other Char")
+
+
+class TestPlayerViewAuthorization:
+    """Unauthenticated users get redirected; users without casting get 403."""
+
+    PROTECTED_VIEWS = [
+        "/post/{slug}/",
+        "/post/{slug}/create/",
+        "/post/{slug}/discover/faculty/",
+        "/post/{slug}/discover/students/",
+        "/post/{slug}/discover/other/",
+    ]
+
+    def test_unauthenticated_redirected_to_login(self, run, db, client):
+        for pattern in self.PROTECTED_VIEWS:
+            url = pattern.format(slug=run.slug)
+            resp = client.get(url)
+            assert resp.status_code == 302, f"Expected redirect for {url}, got {resp.status_code}"
+            assert "/accounts/login/" in resp.url
+
+    def test_unauthenticated_redirected_for_post_detail(self, run, casting, player_client, client):
+        post = PostFactory(run=run, casting=casting, author=casting.user)
+        resp = client.get(f"/post/{run.slug}/post/{post.pk}/")
+        assert resp.status_code == 302
+        assert "/accounts/login/" in resp.url
+
+    def test_authenticated_without_casting_gets_403(self, run, db):
+        from django.test import Client as DjangoClient
+        user = UserFactory(email="nocasting@test.com")
+        c = DjangoClient()
+        c.login(username=user.email, password="testpass123")
+        for pattern in self.PROTECTED_VIEWS:
+            url = pattern.format(slug=run.slug)
+            resp = c.get(url)
+            assert resp.status_code == 403, f"Expected 403 for {url}, got {resp.status_code}"
+
+    def test_player_with_casting_can_access_message_board(self, run, casting, player_client):
+        resp = player_client.get(f"/post/{run.slug}/")
+        assert resp.status_code == 200
+
+    def test_player_with_casting_can_access_discover_faculty(self, run, casting, player_client):
+        resp = player_client.get(f"/post/{run.slug}/discover/faculty/")
+        assert resp.status_code == 200
+
+    def test_player_with_casting_can_access_discover_students(self, run, casting, player_client):
+        resp = player_client.get(f"/post/{run.slug}/discover/students/")
+        assert resp.status_code == 200
+
+    def test_player_with_casting_can_access_discover_other(self, run, casting, player_client):
+        resp = player_client.get(f"/post/{run.slug}/discover/other/")
+        assert resp.status_code == 200
+
+
+class TestPostCRUD:
+    """Create, edit, and delete posts."""
+
+    def test_create_character_post(self, run, casting, player_client):
+        resp = player_client.post(
+            f"/post/{run.slug}/create/",
+            {
+                "post_type": "character",
+                "character_name": "Nadia K",
+                "content": "A brilliant student.",
+                "keywords": "Nerdy,Bookworm",
+            },
+        )
+        assert resp.status_code == 302
+        assert Post.objects.filter(run=run, author=casting.user, post_type="character").exists()
+
+    def test_create_other_post(self, run, casting, player_client):
+        resp = player_client.post(
+            f"/post/{run.slug}/create/",
+            {
+                "post_type": "other",
+                "title": "Duelling Tournament",
+                "category": "extracurricular",
+                "content": "Sign up now!",
+            },
+        )
+        assert resp.status_code == 302
+        assert Post.objects.filter(run=run, post_type="other", title="Duelling Tournament").exists()
+
+    def test_edit_own_post(self, run, casting, player, player_client):
+        post = PostFactory(run=run, casting=casting, author=player, content="Original")
+        resp = player_client.post(
+            f"/post/{run.slug}/post/{post.pk}/edit/",
+            {
+                "post_type": "character",
+                "character_name": "Nadia Updated",
+                "content": "Updated content",
+                "keywords": "",
+            },
+        )
+        assert resp.status_code == 302
+        post.refresh_from_db()
+        assert post.content == "Updated content"
+
+    def test_cannot_edit_another_users_post(self, run, casting, player_client, other_casting):
+        post = PostFactory(run=run, casting=other_casting, author=other_casting.user)
+        resp = player_client.get(f"/post/{run.slug}/post/{post.pk}/edit/")
+        assert resp.status_code == 404
+
+    def test_delete_own_post(self, run, casting, player, player_client):
+        post = PostFactory(run=run, casting=casting, author=player)
+        resp = player_client.post(f"/post/{run.slug}/post/{post.pk}/delete/")
+        assert resp.status_code == 302
+        assert not Post.objects.filter(pk=post.pk).exists()
+
+    def test_cannot_delete_another_users_post(self, run, casting, player_client, other_casting):
+        post = PostFactory(run=run, casting=other_casting, author=other_casting.user)
+        resp = player_client.post(f"/post/{run.slug}/post/{post.pk}/delete/")
+        assert resp.status_code == 404
+        assert Post.objects.filter(pk=post.pk).exists()
+
+
+class TestComments:
+    """Comment creation and threading."""
+
+    def test_create_comment(self, run, casting, player, player_client):
+        post = PostFactory(run=run, casting=casting, author=player)
+        resp = player_client.post(
+            f"/post/{run.slug}/post/{post.pk}/comment/",
+            {"body": "Great character!"},
+        )
+        assert resp.status_code == 200  # returns partial HTML
+        assert Comment.objects.filter(post=post, author=player, body="Great character!").exists()
+
+    def test_reply_to_comment(self, run, casting, player, player_client):
+        post = PostFactory(run=run, casting=casting, author=player)
+        parent = Comment.objects.create(post=post, author=player, body="Parent comment")
+        resp = player_client.post(
+            f"/post/{run.slug}/post/{post.pk}/comment/{parent.pk}/reply/",
+            {"body": "Reply to parent"},
+        )
+        assert resp.status_code == 200
+        reply = Comment.objects.get(body="Reply to parent")
+        assert reply.parent_id == parent.pk
+
+    def test_unauthenticated_cannot_comment(self, run, casting, player, client):
+        post = PostFactory(run=run, casting=casting, author=player)
+        resp = client.post(
+            f"/post/{run.slug}/post/{post.pk}/comment/",
+            {"body": "Sneaky comment"},
+        )
+        assert resp.status_code == 302
+        assert "/accounts/login/" in resp.url
+
+
+class TestDiscoverViews:
+    """Discover section filtering."""
+
+    def test_faculty_view_returns_faculty_posts(self, run, casting, player_client):
+        prof_casting = CastingFactory(run=run, role="professor", character_name="Prof Snape")
+        prof_post = PostFactory(run=run, casting=prof_casting, author=prof_casting.user)
+        student_post = PostFactory(run=run, casting=casting, author=casting.user)
+
+        resp = player_client.get(f"/post/{run.slug}/discover/faculty/")
+        assert resp.status_code == 200
+        post_pks = [p.pk for p in resp.context["posts"]]
+        assert prof_post.pk in post_pks
+        assert student_post.pk not in post_pks
+
+    def test_student_filter_by_house(self, run, casting, player_client):
+        house = run.houses.first()
+        student_in_house = CastingFactory(run=run, role="student", house=house, character_name="Housed Student")
+        post_in_house = PostFactory(run=run, casting=student_in_house, author=student_in_house.user)
+
+        other_house = run.houses.last()
+        student_other = CastingFactory(run=run, role="student", house=other_house, character_name="Other Student")
+        post_other = PostFactory(run=run, casting=student_other, author=student_other.user)
+
+        resp = player_client.get(f"/post/{run.slug}/discover/students/filter/?house={house.pk}")
+        assert resp.status_code == 200
+        content = resp.content.decode()
+        assert student_in_house.character_name in content
+
+    def test_student_filter_by_keyword(self, run, casting, player_client):
+        student = CastingFactory(run=run, role="student", character_name="Keyword Student")
+        post = PostFactory(run=run, casting=student, author=student.user)
+        PostKeywordFactory(post=post, label="Nerdy")
+
+        other_student = CastingFactory(run=run, role="student", character_name="No Keyword")
+        other_post = PostFactory(run=run, casting=other_student, author=other_student.user)
+        PostKeywordFactory(post=other_post, label="Athletic")
+
+        resp = player_client.get(f"/post/{run.slug}/discover/students/filter/?keyword=Nerdy")
+        assert resp.status_code == 200
+        content = resp.content.decode()
+        assert "Keyword Student" in content
+        assert "No Keyword" not in content
+
+    def test_other_posts_filterable_by_category(self, run, casting, player, player_client):
+        extra_post = PostFactory(
+            run=run, casting=casting, author=player,
+            post_type="other", title="Extracurricular Event", category="extracurricular",
+        )
+        plot_post = PostFactory(
+            run=run, casting=casting, author=player,
+            post_type="other", title="School Plot", category="school_plot",
+        )
+
+        resp = player_client.get(f"/post/{run.slug}/discover/other/?category=extracurricular")
+        assert resp.status_code == 200
+        post_pks = [p.pk for p in resp.context["posts"]]
+        assert extra_post.pk in post_pks
+        assert plot_post.pk not in post_pks
+
+
+class TestPhotoDeletion:
+    """Photo deletion via edit, including IDOR prevention."""
+
+    @pytest.fixture(autouse=True)
+    def _use_tmp_media(self, tmp_path, settings):
+        settings.MEDIA_ROOT = str(tmp_path)
+
+    @pytest.fixture
+    def post_with_photos(self, run, casting, player):
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        post = PostFactory(run=run, casting=casting, author=player)
+        img = SimpleUploadedFile("test.jpg", b"\xff\xd8\xff\xe0" + b"\x00" * 100, content_type="image/jpeg")
+        photo1 = Photo.objects.create(post=post, image=img, sort_order=0)
+        img2 = SimpleUploadedFile("test2.jpg", b"\xff\xd8\xff\xe0" + b"\x00" * 100, content_type="image/jpeg")
+        photo2 = Photo.objects.create(post=post, image=img2, sort_order=1)
+        return post, photo1, photo2
+
+    def test_edit_with_delete_photos_removes_specified(self, run, casting, player_client, post_with_photos):
+        post, photo1, photo2 = post_with_photos
+        resp = player_client.post(
+            f"/post/{run.slug}/post/{post.pk}/edit/",
+            {
+                "post_type": "character",
+                "character_name": "Nadia",
+                "content": "Updated",
+                "keywords": "",
+                "delete_photos": [str(photo1.pk)],
+            },
+        )
+        assert resp.status_code == 302
+        assert not Photo.objects.filter(pk=photo1.pk).exists()
+        assert Photo.objects.filter(pk=photo2.pk).exists()
+
+    def test_delete_photos_from_other_post_ignored(self, run, casting, player, player_client, post_with_photos, other_casting):
+        """IDOR prevention: photo IDs from another post should not be deleted."""
+        post, photo1, photo2 = post_with_photos
+        from django.core.files.uploadedfile import SimpleUploadedFile
+
+        other_post = PostFactory(run=run, casting=other_casting, author=other_casting.user)
+        img = SimpleUploadedFile("other.jpg", b"\xff\xd8\xff\xe0" + b"\x00" * 100, content_type="image/jpeg")
+        other_photo = Photo.objects.create(post=other_post, image=img, sort_order=0)
+
+        resp = player_client.post(
+            f"/post/{run.slug}/post/{post.pk}/edit/",
+            {
+                "post_type": "character",
+                "character_name": "Nadia",
+                "content": "Updated",
+                "keywords": "",
+                "delete_photos": [str(other_photo.pk)],
+            },
+        )
+        assert resp.status_code == 302
+        # The other post's photo should NOT have been deleted
+        assert Photo.objects.filter(pk=other_photo.pk).exists()

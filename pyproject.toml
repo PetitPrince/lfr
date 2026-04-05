@@ -9,7 +9,7 @@ dependencies = [
     "django-extensions>=3.2",
     "Pillow>=11.0",
     "markdown>=3.7",
-    "bleach>=6.1",
+    "nh3>=0.3",
     "django-allauth[socialaccount]>=65.0",
 ]
 

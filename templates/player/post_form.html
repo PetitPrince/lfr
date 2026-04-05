@@ -118,9 +118,21 @@
     {% endif %}
 
     <label for="id_photos">Photos</label>
+    {% if editing and post.photos.all %}
+    <div id="existing-photos" style="display:flex;flex-wrap:wrap;gap:0.5em;margin-bottom:0.5em">
+        {% for photo in post.photos.all %}
+        <div style="position:relative;display:inline-block">
+            <img src="{{ photo.image.url }}" alt="{{ photo.caption }}" style="width:120px;height:120px;object-fit:cover;border-radius:4px">
+            <label style="display:block;text-align:center;font-size:0.8em">
+                <input type="checkbox" name="delete_photos" value="{{ photo.pk }}"> Remove
+            </label>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
     <input type="file" name="photos" id="id_photos" multiple accept="image/*">
     {% if editing and post.photos.all %}
-    <small class="text-muted">{{ post.photos.count }} existing photo(s). New uploads are added alongside them.</small>
+    <small class="text-muted">Check "Remove" to delete photos. New uploads are added alongside remaining ones.</small>
     {% endif %}
 
     {% if form.errors %}

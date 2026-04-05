@@ -1,10 +1,8 @@
-import json
 from collections import defaultdict
 
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q
-from django.http import HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 
@@ -184,6 +182,7 @@ class PostEditView(PlayerRunMixin, View):
                 if post.category != Post.OtherCategory.CLUB_RECRUITMENT:
                     post.club = None
                 post.save()
+                _delete_photos(request, post)
                 _save_photos(request, post)
                 messages.success(request, "Post updated!")
                 return redirect("posts:post_detail", slug=self.run.slug, pk=post.pk)
@@ -198,6 +197,7 @@ class PostEditView(PlayerRunMixin, View):
                 _save_keywords(request, post)
                 _save_looking_for(request, post)
                 _save_rumors(request, post)
+                _delete_photos(request, post)
                 _save_photos(request, post)
                 messages.success(request, "Post updated!")
                 return redirect("posts:post_detail", slug=self.run.slug, pk=post.pk)
@@ -471,6 +471,12 @@ def _save_rumors(request, post):
         text = text.strip()
         if text:
             Rumor.objects.create(post=post, text=text, sort_order=i)
+
+
+def _delete_photos(request, post):
+    ids = request.POST.getlist("delete_photos")
+    if ids:
+        post.photos.filter(pk__in=ids).delete()
 
 
 ALLOWED_PHOTO_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
