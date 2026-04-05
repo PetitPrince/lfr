@@ -276,6 +276,46 @@ Feed cards and detail views display photos in a tiled grid rather than a single 
 - **Target browsers:** last 2 versions of Chrome, Firefox, Safari, Edge. No IE11 support.
 - Tom Select: add minimal CSS overrides in `player.css` to match input styling (border color, border-radius, font family)
 
+## Per-Run Color Overrides
+
+Organizers can customize a run's color scheme to match their event's branding. A small set of fields on the `Run` model drives the theming — not every token, just the ones that define the visual identity.
+
+### Model Fields (on `Run`)
+
+| Field | Type | Default | Maps to |
+|---|---|---|---|
+| `theme_accent` | CharField(max_length=7, blank=True) | `""` (uses `--gold`) | `--gold`, `--gold-muted` (derived), `--gold-dark` (derived) |
+| `theme_nav_bg` | CharField(max_length=7, blank=True) | `""` (uses `--brown-dark`) | `--brown-dark`, `--brown-mid` (derived) |
+| `theme_page_bg` | CharField(max_length=7, blank=True) | `""` (uses `--parchment-light`) | `--parchment-light`, `--parchment-dark` (derived) |
+| `theme_text` | CharField(max_length=7, blank=True) | `""` (uses `--ink`) | `--ink` |
+
+All fields are optional hex color strings (e.g. `#c4a265`). Empty means "use default."
+
+### Derivation
+
+From each base color, related tokens are derived automatically (e.g. accent color generates muted and dark variants by adjusting lightness). This keeps the organizer-facing UI simple (4 color pickers) while maintaining palette coherence. Derivation happens in a template tag or context processor — not in CSS.
+
+### Template Integration
+
+The player `base.html` (and standalone pages) output an inline `<style>` block before the `player.css` link when any theme field is set:
+
+```html
+{% if run.theme_accent or run.theme_nav_bg or run.theme_page_bg or run.theme_text %}
+<style>
+  :root {
+    {% if run.theme_accent %}--gold: {{ run.theme_accent }};{% endif %}
+    /* derived values set by template tag */
+  }
+</style>
+{% endif %}
+```
+
+This overrides the `player.css` defaults. Dark mode derivation adjusts automatically from the same base colors.
+
+### Dashboard UI
+
+Add a "Theme" section to the run settings page with 4 color picker inputs. Preview swatch next to each. No live preview in v1 — organizer saves and checks the player-facing side.
+
 ## Dark Mode
 
 A "candlelit study" dark mode — same warm palette inverted, not a generic cold dark theme. Toggled via `prefers-color-scheme: dark` media query (follows OS setting). No manual toggle in v1.
