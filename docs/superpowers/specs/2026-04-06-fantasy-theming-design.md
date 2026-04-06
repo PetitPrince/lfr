@@ -297,7 +297,7 @@ From each base color, related tokens are derived automatically (e.g. accent colo
 
 ### Template Integration
 
-The player `base.html` (and standalone pages) output an inline `<style>` block before the `player.css` link when any theme field is set:
+The player `base.html` (and standalone pages) output an inline `<style>` block **after** the `player.css` link (so overrides win by CSS cascade order) when any theme field is set:
 
 ```html
 {% if run.theme_accent or run.theme_nav_bg or run.theme_page_bg or run.theme_text %}
