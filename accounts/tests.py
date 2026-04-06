@@ -325,7 +325,7 @@ class LandingPageInviteOnlyTests(TestCase):
 
     def test_landing_has_login_button(self):
         response = self.client.get(reverse("landing"))
-        self.assertContains(response, "Log in")
+        self.assertContains(response, "Log In")
 
     def test_landing_mentions_invite(self):
         response = self.client.get(reverse("landing"))
