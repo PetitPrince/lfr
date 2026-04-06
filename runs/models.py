@@ -88,6 +88,12 @@ class Run(models.Model):
     teaching_subjects = models.ManyToManyField(TeachingSubject, blank=True, related_name="runs")
     blood_statuses = models.ManyToManyField(BloodStatus, blank=True, related_name="runs")
 
+    # Per-run theme color overrides (optional hex strings, e.g. "#c4a265")
+    theme_accent = models.CharField(max_length=7, blank=True, default="", help_text="Accent color (gold)")
+    theme_nav_bg = models.CharField(max_length=7, blank=True, default="", help_text="Navigation background")
+    theme_page_bg = models.CharField(max_length=7, blank=True, default="", help_text="Page background")
+    theme_text = models.CharField(max_length=7, blank=True, default="", help_text="Primary text color")
+
     class Meta:
         ordering = ["-start_date"]
 
