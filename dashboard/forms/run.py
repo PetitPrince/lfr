@@ -41,8 +41,27 @@ class RunCreateForm(forms.ModelForm):
 class RunSettingsForm(forms.ModelForm):
     class Meta:
         model = Run
-        fields = ["name", "start_date", "end_date", "is_active"]
+        fields = [
+            "name", "start_date", "end_date", "is_active",
+            "theme_accent", "theme_nav_bg", "theme_page_bg", "theme_text",
+        ]
         widgets = {
             "start_date": forms.DateInput(attrs={"type": "date"}),
             "end_date": forms.DateInput(attrs={"type": "date"}),
+            "theme_accent": forms.TextInput(attrs={"type": "color"}),
+            "theme_nav_bg": forms.TextInput(attrs={"type": "color"}),
+            "theme_page_bg": forms.TextInput(attrs={"type": "color"}),
+            "theme_text": forms.TextInput(attrs={"type": "color"}),
+        }
+        labels = {
+            "theme_accent": "Accent color",
+            "theme_nav_bg": "Navigation background",
+            "theme_page_bg": "Page background",
+            "theme_text": "Text color",
+        }
+        help_texts = {
+            "theme_accent": "Used for buttons, links, and highlights",
+            "theme_nav_bg": "Navigation bar background",
+            "theme_page_bg": "Main page background",
+            "theme_text": "Primary text color",
         }

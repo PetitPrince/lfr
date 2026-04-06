@@ -15,12 +15,27 @@
             {{ field }} {{ field.label }}
         </label>
     </fieldset>
-    {% else %}
+    {% elif field.name == "theme_accent" %}
+    <fieldset>
+        <legend>Theme Colors</legend>
+        <small class="text-muted">Leave blank to use the default Enchanted Parchment theme. Set colors to customize the player-facing look for this run.</small>
+        {% for theme_field in form %}
+        {% if theme_field.name|slice:":6" == "theme_" %}
+        <div style="margin-bottom:0.5em;">
+            <label for="{{ theme_field.id_for_label }}">{{ theme_field.label }}</label>
+            {{ theme_field }}
+            {% if theme_field.help_text %}<small class="text-muted">{{ theme_field.help_text }}</small>{% endif %}
+            {% if theme_field.errors %}<small class="text-error">{{ theme_field.errors.0 }}</small>{% endif %}
+        </div>
+        {% endif %}
+        {% endfor %}
+    </fieldset>
+    {% elif field.name|slice:":6" != "theme_" %}
     <label for="{{ field.id_for_label }}">{{ field.label }}</label>
     {{ field }}
-    {% endif %}
     {% if field.errors %}
     <small class="text-error">{{ field.errors.0 }}</small>
+    {% endif %}
     {% endif %}
     {% endfor %}
 
