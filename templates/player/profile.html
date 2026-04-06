@@ -3,21 +3,27 @@
 {% block title %}Profile — LFR{% endblock %}
 
 {% block content %}
-<h2>Profile</h2>
-<form method="post">
-    {% csrf_token %}
-    {% for field in form %}
-    <label>
-        {{ field.label }}
-        {{ field }}
-        {% if field.errors %}
-        <small class="text-error">{{ field.errors.0 }}</small>
-        {% endif %}
-        {% if field.help_text %}
-        <small class="text-muted">{{ field.help_text }}</small>
-        {% endif %}
-    </label>
-    {% endfor %}
-    <button type="submit">Save</button>
-</form>
+<div style="max-width: 500px; margin: 0 auto;">
+    <h2 class="page-center font-serif">Your Profile</h2>
+    <p class="text-muted page-center">Update your account details below.</p>
+    <div class="divider" aria-hidden="true">&#8226; &#10040; &#8226;</div>
+    <div class="form-card">
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+            <div>
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                <span class="text-error">{{ field.errors.0 }}</span>
+                {% endif %}
+                {% if field.help_text %}
+                <span class="text-muted text-small">{{ field.help_text }}</span>
+                {% endif %}
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn-primary">Save Profile</button>
+        </form>
+    </div>
+</div>
 {% endblock %}

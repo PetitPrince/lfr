@@ -3,26 +3,39 @@
 {% block title %}My Runs — LFR{% endblock %}
 
 {% block content %}
-<h2>My Runs</h2>
+<h2 class="page-center font-serif">My Runs</h2>
+<div class="divider" aria-hidden="true">&#8226; &#10040; &#8226;</div>
 
 {% if castings %}
 {% for c in castings %}
-<article>
-    <header>
-        <h3><a href="{% url 'posts:message_board' slug=c.run.slug %}">{{ c.run.name }}</a></h3>
-    </header>
+<div class="run-card">
+    <h3><a href="{% url 'posts:message_board' slug=c.run.slug %}">{{ c.run.name }}</a></h3>
     <p>
         <strong>{{ c.character_name }}</strong> — {{ c.get_role_display }}
-        {% if c.house %} &middot; {{ c.house }}{% endif %}
-        {% if c.year %} &middot; {{ c.year }}{% endif %}
+        {% if c.house %}
+        &middot;
+        {% if c.house.color %}
+        <span class="house-badge" style="background-color: {{ c.house.color }};">{{ c.house }}</span>
+        {% else %}
+        {{ c.house }}
+        {% endif %}
+        {% endif %}
+        {% if c.year %}
+        &middot;
+        {% if c.year.color %}
+        <span class="year-badge" style="background-color: {{ c.year.color }};">{{ c.year }}</span>
+        {% else %}
+        <span class="year-badge">{{ c.year }}</span>
+        {% endif %}
+        {% endif %}
         {% if c.path %} &middot; {{ c.path }}{% endif %}
     </p>
     {% if c.run.start_date %}
-    <small class="text-muted">{{ c.run.start_date }} — {{ c.run.end_date|default:"TBD" }}</small>
+    <p class="text-muted text-small">{{ c.run.start_date }} — {{ c.run.end_date|default:"TBD" }}</p>
     {% endif %}
-</article>
+</div>
 {% endfor %}
 {% else %}
-<p>You haven't joined any runs yet. Use an invite link from your organizer to get started.</p>
+<p class="text-muted">You haven't joined any runs yet. Use an invite link from your organizer to get started.</p>
 {% endif %}
 {% endblock %}
