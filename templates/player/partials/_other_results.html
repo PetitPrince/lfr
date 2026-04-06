@@ -1,14 +1,14 @@
 {% for post in posts %}
-<article>
-    <header>
-        <h4><a href="{% url 'posts:post_detail' slug=run.slug pk=post.pk %}">{{ post.title }}</a></h4>
-        <small class="text-muted">
-            <span class="badge">{{ post.get_category_display }}</span>
-            {% if post.club %}<span class="badge">{{ post.club }}</span>{% endif %}
-            &middot; {{ post.created_at|timesince }} ago
-        </small>
-    </header>
-    <p>{{ post.content|truncatechars:200 }}</p>
+<article class="card card-no-hover" style="margin-bottom:1rem;">
+    <h4 style="margin:0 0 0.25rem;">
+        <a href="{% url 'posts:post_detail' slug=run.slug pk=post.pk %}">{{ post.title }}</a>
+    </h4>
+    <div style="margin-bottom:0.5rem;">
+        <span class="badge">{{ post.get_category_display }}</span>
+        {% if post.club %}<span class="badge">{{ post.club }}</span>{% endif %}
+        <span class="text-muted text-small" style="margin-left:0.5rem;">&middot; {{ post.created_at|timesince }} ago</span>
+    </div>
+    <p class="text-muted" style="margin:0;">{{ post.content|truncatechars:200 }}</p>
 </article>
 {% empty %}
 <p class="text-muted">No posts in this category.</p>

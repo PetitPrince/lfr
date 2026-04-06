@@ -3,19 +3,26 @@
 {% block title %}Other Posts — {{ run.name }}{% endblock %}
 
 {% block content %}
-<h2>Other Posts</h2>
+<div class="page-header">
+    <h2 class="section-title font-serif">Other Posts</h2>
+    <p class="text-muted">Announcements, plots, and extracurriculars for {{ run.name }}</p>
+</div>
 
-<label for="f-category">Category</label>
-<select id="f-category"
-        hx-get="{% url 'posts:discover_other' slug=run.slug %}"
-        hx-target="#other-results"
-        hx-swap="innerHTML"
-        name="category">
-    <option value="">All</option>
-    {% for val, label in categories %}
-    <option value="{{ val }}" {% if initial_category == val %}selected{% endif %}>{{ label }}</option>
-    {% endfor %}
-</select>
+<div class="divider" aria-hidden="true"></div>
+
+<div style="margin-bottom:1.5rem;">
+    <label for="f-category">Category</label>
+    <select id="f-category"
+            hx-get="{% url 'posts:discover_other' slug=run.slug %}"
+            hx-target="#other-results"
+            hx-swap="innerHTML"
+            name="category">
+        <option value="">All</option>
+        {% for val, label in categories %}
+        <option value="{{ val }}" {% if initial_category == val %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+    </select>
+</div>
 
 <div id="other-results">
     {% include "player/partials/_other_results.html" %}

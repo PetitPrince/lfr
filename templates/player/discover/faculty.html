@@ -3,29 +3,18 @@
 {% block title %}Faculty — {{ run.name }}{% endblock %}
 
 {% block content %}
-<h2>Faculty</h2>
+<div class="page-header">
+    <h2 class="section-title font-serif">Faculty</h2>
+    <p class="text-muted">The professors, staff, and headmaster of {{ run.name }}</p>
+</div>
+
+<div class="divider" aria-hidden="true"></div>
 
 <div class="faculty-grid">
 {% for post in posts %}
-<article class="faculty-card">
-    {% if post.photos.all %}
-    <img src="{{ post.photos.first.image.url }}" alt="{{ post.casting.character_name }}">
-    {% else %}
-    <div style="width:150px;height:150px;background:var(--pico-secondary-background);border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center">
-        <span style="font-size:2em">{{ post.casting.character_name|first }}</span>
-    </div>
-    {% endif %}
-    <h4 style="margin:0.5em 0 0.2em">
-        <a href="{% url 'posts:post_detail' slug=run.slug pk=post.pk %}">{{ post.casting.character_name }}</a>
-    </h4>
-    <small>
-        {{ post.casting.get_role_display }}
-        {% if post.casting.teaching_subject %}<br>{{ post.casting.teaching_subject }}{% endif %}
-        {% if post.casting.monitor_of_house %}<br>Monitor of {{ post.casting.monitor_of_house }}{% endif %}
-    </small>
-</article>
+    {% include "player/partials/_post_card_faculty.html" %}
 {% empty %}
-<p>No faculty posts yet.</p>
+<p class="text-muted">No faculty posts yet.</p>
 {% endfor %}
 </div>
 {% endblock %}
