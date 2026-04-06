@@ -7,42 +7,39 @@
 
 {% if not character_post %}
 <div class="cta-banner">
-    <strong>You haven't posted your character introduction yet!</strong>
-    <a href="{% url 'posts:post_create' slug=run.slug %}?type=character" role="button">Create Character Post</a>
+    <span class="font-serif">You haven't introduced your character yet.</span>
+    <a href="{% url 'posts:post_create' slug=run.slug %}?type=character" class="btn-primary">Write Introduction</a>
 </div>
 {% endif %}
 
+{% if character_post %}
 <p>
-    {% if character_post %}
-    <a href="{% url 'posts:post_edit' slug=run.slug pk=character_post.pk %}" role="button" class="outline">Edit My Character Post</a>
-    {% endif %}
-    {% if can_create_character %}
-    <a href="{% url 'posts:post_create' slug=run.slug %}?type=character" role="button" class="outline">New Character Post</a>
-    {% endif %}
-    <a href="{% url 'posts:post_create' slug=run.slug %}?type=other" role="button" class="outline secondary">New Other Post</a>
+    <a href="{% url 'posts:post_edit' slug=run.slug pk=character_post.pk %}" class="btn-outline">Edit My Character Post</a>
 </p>
+{% endif %}
+
+<div class="divider divider-lg" aria-hidden="true">&#8226; &#10040; &#8226;</div>
 
 <div id="post-feed">
 {% for post in page_obj %}
-<div class="post-preview" id="post-{{ post.pk }}">
+<div id="post-{{ post.pk }}">
     {% include "player/partials/_post_preview.html" %}
 </div>
+{% if not forloop.last %}<div class="divider" aria-hidden="true">&#8212;&#8212; &#10043; &#8212;&#8212;</div>{% endif %}
 {% empty %}
-<p>No posts yet. Be the first to introduce your character!</p>
+<p class="text-muted">No posts yet.</p>
 {% endfor %}
 </div>
 
 {% if page_obj.has_other_pages %}
-<nav>
-    <ul>
-        {% if page_obj.has_previous %}
-        <li><a href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
-        {% endif %}
-        <li>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</li>
-        {% if page_obj.has_next %}
-        <li><a href="?page={{ page_obj.next_page_number }}">Next</a></li>
-        {% endif %}
-    </ul>
-</nav>
+<div class="pagination">
+    {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+    {% endif %}
+    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}">Next</a>
+    {% endif %}
+</div>
 {% endif %}
 {% endblock %}
