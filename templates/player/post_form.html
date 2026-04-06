@@ -10,144 +10,169 @@
 {% endblock %}
 
 {% block content %}
-<h2>{% if editing %}Edit Post{% elif post_type == "other" %}New Post{% else %}Character Introduction{% endif %}</h2>
+<div class="page-header">
+    <h2 class="section-title font-serif">{% if editing %}Edit Post{% elif post_type == "other" %}New Post{% else %}Character Introduction{% endif %}</h2>
+</div>
+
+<div class="divider" aria-hidden="true"></div>
 
 {% if post_type == "character" %}
 {# Show casting info as read-only #}
-<article>
-    <header><strong>Your Casting</strong></header>
-    <table>
-        <tr><th>Role</th><td>{{ casting.get_role_display }}</td></tr>
-        {% if casting.house %}<tr><th>House</th><td>{{ casting.house }}</td></tr>{% endif %}
-        {% if casting.year %}<tr><th>Year</th><td>{{ casting.year }}</td></tr>{% endif %}
-        {% if casting.path %}<tr><th>Path</th><td>{{ casting.path }}</td></tr>{% endif %}
-        {% if casting.teaching_subject %}<tr><th>Teaching</th><td>{{ casting.teaching_subject }}</td></tr>{% endif %}
-        {% if casting.staff_title %}<tr><th>Title</th><td>{{ casting.staff_title }}</td></tr>{% endif %}
-    </table>
-</article>
+<div class="card card-no-hover" style="margin-bottom:1.5rem;">
+    <h3 class="section-title">Your Casting</h3>
+    <div class="casting-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+        <div><span class="text-muted text-small">Role</span><br>{{ casting.get_role_display }}</div>
+        {% if casting.house %}
+        <div><span class="text-muted text-small">House</span><br>{{ casting.house }}</div>
+        {% endif %}
+        {% if casting.year %}
+        <div><span class="text-muted text-small">Year</span><br>{{ casting.year }}</div>
+        {% endif %}
+        {% if casting.path %}
+        <div><span class="text-muted text-small">Path</span><br>{{ casting.path }}</div>
+        {% endif %}
+        {% if casting.teaching_subject %}
+        <div><span class="text-muted text-small">Teaching</span><br>{{ casting.teaching_subject }}</div>
+        {% endif %}
+        {% if casting.staff_title %}
+        <div><span class="text-muted text-small">Title</span><br>{{ casting.staff_title }}</div>
+        {% endif %}
+    </div>
+</div>
 {% endif %}
 
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    <input type="hidden" name="post_type" value="{{ post_type }}">
+<div class="form-card">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="post_type" value="{{ post_type }}">
 
-    {% if post_type == "character" %}
-        <label for="id_character_name">Character Name</label>
-        <input type="text" name="character_name" id="id_character_name" value="{{ form.character_name.value|default:'' }}" required>
+        {% if post_type == "character" %}
+            <label for="id_character_name">Character Name</label>
+            <input type="text" name="character_name" id="id_character_name" value="{{ form.character_name.value|default:'' }}" required>
 
-        <label for="id_blood_status">Blood Status</label>
-        <select name="blood_status" id="id_blood_status">
-            <option value="">---</option>
-            {% for bs in form.fields.blood_status.queryset %}
-            <option value="{{ bs.pk }}" {% if form.blood_status.value|stringformat:"d" == bs.pk|stringformat:"d" %}selected{% endif %}>{{ bs }}</option>
-            {% endfor %}
-        </select>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
+                <div>
+                    <label for="id_blood_status">Blood Status</label>
+                    <select name="blood_status" id="id_blood_status">
+                        <option value="">---</option>
+                        {% for bs in form.fields.blood_status.queryset %}
+                        <option value="{{ bs.pk }}" {% if form.blood_status.value|stringformat:"d" == bs.pk|stringformat:"d" %}selected{% endif %}>{{ bs }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="id_clubs">Clubs</label>
+                    <select name="clubs" id="id_clubs" multiple>
+                        {% for club in form.fields.clubs.queryset %}
+                        <option value="{{ club.pk }}" {% if club.pk in form.clubs.value or club in form.fields.clubs.initial %}selected{% endif %}>{{ club }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        {% endif %}
 
-        <label for="id_clubs">Clubs</label>
-        <select name="clubs" id="id_clubs" multiple>
-            {% for club in form.fields.clubs.queryset %}
-            <option value="{{ club.pk }}" {% if club.pk in form.clubs.value or club in form.fields.clubs.initial %}selected{% endif %}>{{ club }}</option>
-            {% endfor %}
-        </select>
-    {% endif %}
+        {% if post_type == "other" %}
+            <label for="id_title">Title</label>
+            <input type="text" name="title" id="id_title" value="{{ form.title.value|default:'' }}" required>
 
-    {% if post_type == "other" %}
-        <label for="id_title">Title</label>
-        <input type="text" name="title" id="id_title" value="{{ form.title.value|default:'' }}" required>
-
-        <label for="id_category">Category</label>
-        <select name="category" id="id_category">
-            <option value="">---</option>
-            {% for val, label in form.fields.category.choices %}
-            {% if val %}
-            <option value="{{ val }}" {% if form.category.value == val %}selected{% endif %}>{{ label }}</option>
-            {% endif %}
-            {% endfor %}
-        </select>
-
-        <div id="club-field">
-            <label for="id_club">Club (for club recruitment)</label>
-            <select name="club" id="id_club">
+            <label for="id_category">Category</label>
+            <select name="category" id="id_category">
                 <option value="">---</option>
-                {% for club in form.fields.club.queryset %}
-                <option value="{{ club.pk }}" {% if form.club.value == club.pk|stringformat:"d" %}selected{% endif %}>{{ club }}</option>
+                {% for val, label in form.fields.category.choices %}
+                {% if val %}
+                <option value="{{ val }}" {% if form.category.value == val %}selected{% endif %}>{{ label }}</option>
+                {% endif %}
                 {% endfor %}
             </select>
-        </div>
-    {% endif %}
 
-    <label for="id_content">{% if post_type == "character" %}About Your Character{% else %}Content{% endif %}</label>
-    <textarea name="content" id="id_content" rows="10">{{ form.content.value|default:'' }}</textarea>
+            <div id="club-field">
+                <label for="id_club">Club (for club recruitment)</label>
+                <select name="club" id="id_club">
+                    <option value="">---</option>
+                    {% for club in form.fields.club.queryset %}
+                    <option value="{{ club.pk }}" {% if form.club.value == club.pk|stringformat:"d" %}selected{% endif %}>{{ club }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        {% endif %}
 
-    {% if post_type == "character" %}
-    <label for="id_keywords">Keywords</label>
-    <input type="text" name="keywords" id="id_keywords"
-           value="{% if editing and existing_keywords %}{{ existing_keywords|join:', ' }}{% endif %}"
-           placeholder="Nerdy, Bookworm, Brilliant...">
+        <label for="id_content">{% if post_type == "character" %}About Your Character{% else %}Content{% endif %}</label>
+        <textarea name="content" id="id_content" rows="10">{{ form.content.value|default:'' }}</textarea>
 
-    <fieldset>
-        <legend>Looking For</legend>
+        {% if post_type == "character" %}
+        <label for="id_keywords">Keywords</label>
+        <input type="text" name="keywords" id="id_keywords"
+               value="{% if editing and existing_keywords %}{{ existing_keywords|join:', ' }}{% endif %}"
+               placeholder="Nerdy, Bookworm, Brilliant...">
+
+        <div class="divider" aria-hidden="true"></div>
+
+        <h3 class="section-title font-serif" style="margin-bottom:0.75rem;">Looking For</h3>
         <div id="looking-for-rows">
             {% if editing and existing_looking_for %}
             {% for lf in existing_looking_for %}
-            <div class="looking-for-row" style="margin-bottom:0.5em">
-                <input type="text" name="lf_label" value="{{ lf.label }}" placeholder="Label (e.g. Friends, Rivals)" style="display:inline-block;width:30%">
-                <input type="text" name="lf_description" value="{{ lf.description }}" placeholder="Description..." style="display:inline-block;width:60%">
-                <button type="button" onclick="this.parentElement.remove()" class="outline secondary" style="padding:0.2em 0.5em">X</button>
+            <div class="lf-row" style="display:flex; gap:0.5rem; margin-bottom:0.5rem;">
+                <input type="text" name="lf_label" value="{{ lf.label }}" placeholder="Label (e.g. Friends, Rivals)" style="flex:0 0 30%;">
+                <input type="text" name="lf_description" value="{{ lf.description }}" placeholder="Description..." style="flex:1;">
+                <button type="button" onclick="this.parentElement.remove()" class="btn-danger" style="flex:0 0 auto; padding:0.25rem 0.5rem;">X</button>
             </div>
             {% endfor %}
             {% endif %}
         </div>
-        <button type="button" onclick="addLookingForRow()" class="outline" style="padding:0.3em 0.8em">+ Add</button>
-    </fieldset>
+        <button type="button" onclick="addLookingForRow()" class="btn-outline" style="border-style:dashed; padding:0.3em 0.8em;">+ Add</button>
 
-    <fieldset>
-        <legend>Rumors, Gossips and what people say about {{ post.casting.character_name }}:</legend>
+        <div class="divider" aria-hidden="true"></div>
+
+        <h3 class="section-title font-serif" style="margin-bottom:0.75rem;">Rumors, Gossips and what people say about {% if editing %}{{ post.casting.character_name }}{% else %}your character{% endif %}:</h3>
         <div id="rumor-rows">
             {% if editing and existing_rumors %}
             {% for r in existing_rumors %}
-            <div class="rumor-row" style="margin-bottom:0.5em">
-                <textarea name="rumor_text" rows="2" style="display:inline-block;width:90%">{{ r }}</textarea>
-                <button type="button" onclick="this.parentElement.remove()" class="outline secondary" style="padding:0.2em 0.5em">X</button>
+            <div class="rumor-row" style="display:flex; gap:0.5rem; margin-bottom:0.5rem;">
+                <textarea name="rumor_text" rows="2" style="flex:1;" class="rumor-detail">{{ r }}</textarea>
+                <button type="button" onclick="this.parentElement.remove()" class="btn-danger" style="flex:0 0 auto; padding:0.25rem 0.5rem;">X</button>
             </div>
             {% endfor %}
             {% endif %}
         </div>
-        <button type="button" onclick="addRumorRow()" class="outline" style="padding:0.3em 0.8em">+ Add</button>
-    </fieldset>
-    {% endif %}
+        <button type="button" onclick="addRumorRow()" class="btn-outline" style="border-style:dashed; padding:0.3em 0.8em;">+ Add Rumor</button>
+        {% endif %}
 
-    <label for="id_photos">Photos</label>
-    {% if editing and post.photos.all %}
-    <div id="existing-photos" style="display:flex;flex-wrap:wrap;gap:0.5em;margin-bottom:0.5em">
-        {% for photo in post.photos.all %}
-        <div style="position:relative;display:inline-block">
-            <img src="{{ photo.image.url }}" alt="{{ photo.caption }}" style="width:120px;height:120px;object-fit:cover;border-radius:4px">
-            <label style="display:block;text-align:center;font-size:0.8em">
-                <input type="checkbox" name="delete_photos" value="{{ photo.pk }}"> Remove
-            </label>
+        <div class="divider" aria-hidden="true"></div>
+
+        <h3 class="section-title font-serif" style="margin-bottom:0.75rem;">Photos</h3>
+        {% if editing and post.photos.all %}
+        <div id="existing-photos" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(120px,1fr)); gap:0.75rem; margin-bottom:1rem;">
+            {% for photo in post.photos.all %}
+            <div style="position:relative;">
+                <img src="{{ photo.image.url }}" alt="{{ photo.caption }}" style="width:100%; height:120px; object-fit:cover; border-radius:6px;">
+                <label style="display:block; text-align:center; font-size:0.8em; margin-top:0.25rem;" class="text-muted">
+                    <input type="checkbox" name="delete_photos" value="{{ photo.pk }}"> Remove
+                </label>
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-    <input type="file" name="photos" id="id_photos" multiple accept="image/*">
-    {% if editing and post.photos.all %}
-    <small class="text-muted">Check "Remove" to delete photos. New uploads are added alongside remaining ones.</small>
-    {% endif %}
+        {% endif %}
+        <input type="file" name="photos" id="id_photos" multiple accept="image/*">
+        {% if editing and post.photos.all %}
+        <small class="text-muted">Check "Remove" to delete photos. New uploads are added alongside remaining ones.</small>
+        {% endif %}
 
-    {% if form.errors %}
-    <div style="color: var(--pico-del-color); margin:0.5em 0">
-        {% for field, errors in form.errors.items %}
-        {% for error in errors %}
-        <p>{{ field }}: {{ error }}</p>
-        {% endfor %}
-        {% endfor %}
-    </div>
-    {% endif %}
+        {% if form.errors %}
+        <div class="text-error" style="margin:0.5em 0;">
+            {% for field, errors in form.errors.items %}
+            {% for error in errors %}
+            <p>{{ field }}: {{ error }}</p>
+            {% endfor %}
+            {% endfor %}
+        </div>
+        {% endif %}
 
-    <button type="submit">{% if editing %}Update Post{% else %}Publish{% endif %}</button>
-    <a href="{% url 'posts:message_board' slug=run.slug %}" role="button" class="outline secondary">Cancel</a>
-</form>
+        <div style="display:flex; gap:0.75rem; margin-top:1.5rem;">
+            <button type="submit" class="btn-primary">{% if editing %}Update Post{% else %}Publish{% endif %}</button>
+            <a href="{% url 'posts:message_board' slug=run.slug %}" class="btn-outline">Cancel</a>
+        </div>
+    </form>
+</div>
 {% endblock %}
 
 {% block extra_scripts %}
@@ -170,20 +195,20 @@ document.addEventListener("DOMContentLoaded", function() {
 
 function addLookingForRow() {
     var row = document.createElement('div');
-    row.className = 'looking-for-row';
-    row.style.marginBottom = '0.5em';
-    row.innerHTML = '<input type="text" name="lf_label" placeholder="Label (e.g. Friends, Rivals)" style="display:inline-block;width:30%">' +
-        '<input type="text" name="lf_description" placeholder="Description..." style="display:inline-block;width:60%">' +
-        '<button type="button" onclick="this.parentElement.remove()" class="outline secondary" style="padding:0.2em 0.5em">X</button>';
+    row.className = 'lf-row';
+    row.style.cssText = 'display:flex; gap:0.5rem; margin-bottom:0.5rem;';
+    row.innerHTML = '<input type="text" name="lf_label" placeholder="Label (e.g. Friends, Rivals)" style="flex:0 0 30%;">' +
+        '<input type="text" name="lf_description" placeholder="Description..." style="flex:1;">' +
+        '<button type="button" onclick="this.parentElement.remove()" class="btn-danger" style="flex:0 0 auto; padding:0.25rem 0.5rem;">X</button>';
     document.getElementById('looking-for-rows').appendChild(row);
 }
 
 function addRumorRow() {
     var row = document.createElement('div');
     row.className = 'rumor-row';
-    row.style.marginBottom = '0.5em';
-    row.innerHTML = '<textarea name="rumor_text" rows="2" style="display:inline-block;width:90%" placeholder="What do people whisper about your character?"></textarea>' +
-        '<button type="button" onclick="this.parentElement.remove()" class="outline secondary" style="padding:0.2em 0.5em">X</button>';
+    row.style.cssText = 'display:flex; gap:0.5rem; margin-bottom:0.5rem;';
+    row.innerHTML = '<textarea name="rumor_text" rows="2" style="flex:1;" class="rumor-detail" placeholder="What do people whisper about your character?"></textarea>' +
+        '<button type="button" onclick="this.parentElement.remove()" class="btn-danger" style="flex:0 0 auto; padding:0.25rem 0.5rem;">X</button>';
     document.getElementById('rumor-rows').appendChild(row);
 }
 </script>
