@@ -1,43 +1,56 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Login — LFR</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <title>Log In — LFR</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/player.css' %}">
 </head>
 <body>
-    <main class="container" style="max-width: 400px; margin-top: 10vh;">
-        <article>
-            <header>
-                <h2>LFR — Log In</h2>
-            </header>
+    <nav class="nav">
+        <a href="{% url 'landing' %}" class="nav-brand">&#10022; Looking for Relation &#10022;</a>
+    </nav>
 
-            {% if form.errors %}
-            <p style="color: var(--pico-del-color);">Invalid email or password.</p>
-            {% endif %}
+    <div class="page-container">
+        <div style="max-width: 400px; margin: 8vh auto 0;">
+            <div class="form-card card-no-hover">
+                <div style="text-align: center; margin-bottom: 4px; font-size: 1.6em; color: var(--gold);">&#10022;</div>
+                <div class="form-title">Welcome Back</div>
 
-            <form method="post">
-                {% csrf_token %}
-                <label for="id_username">Email</label>
-                <input type="email" name="username" id="id_username" required autofocus>
+                {% if form.errors %}
+                <p class="text-error" style="font-size: 0.88em; margin-bottom: 12px; text-align: center;">Invalid email or password.</p>
+                {% endif %}
 
-                <label for="id_password">Password</label>
-                <input type="password" name="password" id="id_password" required>
+                <form method="post">
+                    {% csrf_token %}
+                    <label class="form-label" for="id_username">Email</label>
+                    <input type="email" name="username" id="id_username" required autofocus>
 
-                <button type="submit">Log in</button>
-            </form>
+                    <label class="form-label" for="id_password">Password</label>
+                    <input type="password" name="password" id="id_password" required>
 
-            {% load socialaccount %}
-            <hr>
-            <p style="text-align:center; opacity:0.7; font-size:0.9em;">Or continue with</p>
-            <div style="display:flex; flex-direction:column; gap:0.5em;">
-                <a href="{% provider_login_url 'google' %}{% if request.GET.next %}?next={{ request.GET.next|urlencode }}{% endif %}" role="button" class="outline">Google</a>
-                <a href="{% provider_login_url 'discord' %}{% if request.GET.next %}?next={{ request.GET.next|urlencode }}{% endif %}" role="button" class="outline">Discord</a>
-                <a href="{% provider_login_url 'facebook' %}{% if request.GET.next %}?next={{ request.GET.next|urlencode }}{% endif %}" role="button" class="outline">Facebook</a>
+                    <button type="submit" class="btn-primary" style="width: 100%; margin-top: 16px; padding: 10px;">Log In</button>
+                </form>
+
+                {% load socialaccount %}
+                <div class="divider-text" style="margin-top: 20px;">or continue with</div>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <a href="{% provider_login_url 'google' %}{% if request.GET.next %}?next={{ request.GET.next|urlencode }}{% endif %}" class="btn-social">Google</a>
+                    <a href="{% provider_login_url 'discord' %}{% if request.GET.next %}?next={{ request.GET.next|urlencode }}{% endif %}" class="btn-social">Discord</a>
+                    <a href="{% provider_login_url 'facebook' %}{% if request.GET.next %}?next={{ request.GET.next|urlencode }}{% endif %}" class="btn-social">Facebook</a>
+                </div>
+
+                <p style="text-align: center; margin-top: 20px;">
+                    <span class="small-link" style="border: none; cursor: default; color: var(--brown-muted);">Registration is by invite only.</span>
+                </p>
             </div>
+        </div>
+    </div>
 
-        </article>
-    </main>
+    <footer class="site-footer">LFR — a Witchards community tool</footer>
 </body>
 </html>

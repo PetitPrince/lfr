@@ -1,82 +1,103 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Join {{ casting.run.name }} — LFR</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/player.css' %}">
 </head>
 <body>
-    <main class="container" style="max-width: 500px; margin-top: 6vh;">
-        <article>
-            <header>
-                <h2>Join {{ casting.run.name }}</h2>
-            </header>
+    <nav class="nav">
+        <a href="{% url 'landing' %}" class="nav-brand">&#10022; Looking for Relation &#10022;</a>
+    </nav>
+
+    <div class="page-container">
+        <div style="max-width: 500px; margin: 6vh auto 0;">
+
+            {# --- Casting preview card --- #}
+            <div class="card card-lg card-no-hover" style="border-top: 4px solid var(--gold); text-align: center; margin-bottom: 24px;">
+                <p style="font-size: 0.82em; color: var(--brown-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px;">You've Been Invited!</p>
+                <h2 style="font-size: 1.3em; color: var(--ink-light); margin-bottom: 12px;">{{ casting.run.name }}</h2>
+                <div class="divider" style="margin: 8px 0 16px;">&#10022; &#10022; &#10022;</div>
+                <h1 style="font-size: 2em; margin-bottom: 12px;">{{ casting.character_name }}</h1>
+                <div style="margin-bottom: 12px; display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; align-items: center;">
+                    {% if casting.house %}
+                    <span class="house-badge" style="font-size: 0.8em;{% if casting.house.color %} background-color: {{ casting.house.color }};{% else %} background-color: var(--brown-mid);{% endif %}">{{ casting.house }}</span>
+                    {% endif %}
+                    {% if casting.year %}
+                    <span class="year-badge" style="font-size: 0.8em;{% if casting.year.color %} border-color: {{ casting.year.color }};{% else %} border-color: var(--gold-muted);{% endif %}">{{ casting.year }}</span>
+                    {% endif %}
+                </div>
+                <div style="font-size: 0.9em; color: var(--ink-light); line-height: 1.8;">
+                    {% if casting.get_role_display %}<div>{{ casting.get_role_display }}</div>{% endif %}
+                    {% if casting.path %}<div>{{ casting.path }}</div>{% endif %}
+                    {% if casting.blood_status %}<div>{{ casting.blood_status }}</div>{% endif %}
+                    {% if casting.teaching_subject %}<div>{{ casting.teaching_subject }}</div>{% endif %}
+                    {% if casting.staff_title %}<div>{{ casting.staff_title }}</div>{% endif %}
+                </div>
+            </div>
 
             {% if error %}
-            <p style="color: var(--pico-del-color);">{{ error }}</p>
+            <div class="flash flash-error">{{ error }}</div>
             {% endif %}
-
-            {# --- Casting details --- #}
-            <table>
-                <tr><th>Character Name</th><td>{{ casting.character_name }}</td></tr>
-                <tr><th>Role</th><td>{{ casting.get_role_display }}</td></tr>
-                {% if casting.house %}<tr><th>House</th><td>{{ casting.house }}</td></tr>{% endif %}
-                {% if casting.year %}<tr><th>Year</th><td>{{ casting.year }}</td></tr>{% endif %}
-                {% if casting.path %}<tr><th>Path</th><td>{{ casting.path }}</td></tr>{% endif %}
-                {% if casting.blood_status %}<tr><th>Blood Status</th><td>{{ casting.blood_status }}</td></tr>{% endif %}
-                {% if casting.teaching_subject %}<tr><th>Teaching Subject</th><td>{{ casting.teaching_subject }}</td></tr>{% endif %}
-                {% if casting.staff_title %}<tr><th>Title</th><td>{{ casting.staff_title }}</td></tr>{% endif %}
-            </table>
 
             {% if not error %}
                 {% if user.is_authenticated %}
-                {# --- Authenticated: confirm --- #}
-                <form method="post">
+                {# --- Authenticated: one-click confirm --- #}
+                <form method="post" style="text-align: center;">
                     {% csrf_token %}
-                    <button type="submit">Join as {{ casting.character_name }}</button>
+                    <button type="submit" class="btn-primary" style="font-size: 1.05em; padding: 12px 32px;">Join as {{ casting.character_name }}</button>
                 </form>
 
                 {% else %}
                 {# --- Unauthenticated: signup form + social + login link --- #}
-                <hr>
-                <h3>Create an account to join</h3>
+                <div class="form-card card-no-hover">
+                    <div class="form-title">Create Your Account</div>
 
-                {% if form.errors %}
-                {% for field, errors in form.errors.items %}
-                {% for err in errors %}
-                <p style="color: var(--pico-del-color);">{{ err }}</p>
-                {% endfor %}
-                {% endfor %}
-                {% endif %}
+                    {% if form.errors %}
+                    {% for field, errors in form.errors.items %}
+                    {% for err in errors %}
+                    <p class="text-error" style="font-size: 0.88em; margin-bottom: 6px;">{{ err }}</p>
+                    {% endfor %}
+                    {% endfor %}
+                    {% endif %}
 
-                <form method="post">
-                    {% csrf_token %}
-                    <label for="id_email">Email</label>
-                    <input type="email" name="email" id="id_email" value="{{ form.email.value|default:'' }}" required autofocus>
+                    <form method="post">
+                        {% csrf_token %}
+                        <label class="form-label" for="id_email">Email</label>
+                        <input type="email" name="email" id="id_email" value="{{ form.email.value|default:'' }}" required autofocus>
 
-                    <label for="id_password">Password</label>
-                    <input type="password" name="password" id="id_password" required>
+                        <label class="form-label" for="id_password">Password</label>
+                        <input type="password" name="password" id="id_password" required>
 
-                    <label for="id_password_confirm">Confirm Password</label>
-                    <input type="password" name="password_confirm" id="id_password_confirm" required>
+                        <label class="form-label" for="id_password_confirm">Confirm Password</label>
+                        <input type="password" name="password_confirm" id="id_password_confirm" required>
 
-                    <button type="submit">Sign up</button>
-                </form>
+                        <button type="submit" class="btn-primary" style="width: 100%; margin-top: 16px; padding: 10px;">Sign Up</button>
+                    </form>
 
-                {% load socialaccount %}
-                <hr>
-                <p style="text-align:center; opacity:0.7; font-size:0.9em;">Or continue with</p>
-                <div style="display:flex; flex-direction:column; gap:0.5em;">
-                    <a href="{% provider_login_url 'google' next=request.path %}" role="button" class="outline">Google</a>
-                    <a href="{% provider_login_url 'discord' next=request.path %}" role="button" class="outline">Discord</a>
-                    <a href="{% provider_login_url 'facebook' next=request.path %}" role="button" class="outline">Facebook</a>
+                    {% load socialaccount %}
+                    <div class="divider-text" style="margin-top: 20px;">or continue with</div>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <a href="{% provider_login_url 'google' next=request.path %}" class="btn-social">Google</a>
+                        <a href="{% provider_login_url 'discord' next=request.path %}" class="btn-social">Discord</a>
+                        <a href="{% provider_login_url 'facebook' next=request.path %}" class="btn-social">Facebook</a>
+                    </div>
+
+                    <p style="text-align: center; margin-top: 20px; font-size: 0.88em; color: var(--brown-muted);">
+                        Already have an account? <a href="/accounts/login/?next={{ request.path|urlencode }}" class="small-link">Log in</a>
+                    </p>
                 </div>
-
-                <p style="text-align:center; margin-top:1em;">Already have an account? <a href="/accounts/login/?next={{ request.path|urlencode }}">Log in</a></p>
                 {% endif %}
             {% endif %}
-        </article>
-    </main>
+
+        </div>
+    </div>
+
+    <footer class="site-footer">LFR — a Witchards community tool</footer>
 </body>
 </html>
