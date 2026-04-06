@@ -1,0 +1,21 @@
+{% if count > 0 %}
+<div class="{% if size == 'detail' %}photo-grid-detail{% endif %}">
+  <div class="photo-grid {{ grid_class }}">
+    {% for photo in photos %}
+      {% if forloop.first and count >= 3 %}
+        <div class="photo-main">
+          <img src="{{ photo.image.url }}" alt="{{ photo.caption }}">
+        </div>
+      {% elif forloop.last and extra > 0 %}
+        <div class="photo-more" data-more="+{{ extra }} more" style="position:relative;overflow:hidden;">
+          <img src="{{ photo.image.url }}" alt="{{ photo.caption }}">
+        </div>
+      {% else %}
+        <div>
+          <img src="{{ photo.image.url }}" alt="{{ photo.caption }}">
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
