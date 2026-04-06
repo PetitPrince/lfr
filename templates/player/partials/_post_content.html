@@ -7,7 +7,7 @@
         {% if first_photo %}
         <img src="{{ first_photo.image.url }}" alt="{{ first_photo.caption }}">
         {% else %}
-        <img src="/static/img/portrait-placeholder.svg" alt="No portrait">
+        <span class="font-serif" style="font-size: 2em; color: var(--gold-muted);">?</span>
         {% endif %}
         {% endwith %}
     </div>

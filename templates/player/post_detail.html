@@ -5,7 +5,7 @@
 {% block content %}
 <a href="javascript:history.back()" class="back-link">&larr; Back</a>
 
-<div class="detail-card card{% if post.casting and post.casting.house and post.casting.house.color %}" style="border-top: 4px solid {{ post.casting.house.color }}{% endif %}">
+<div class="detail-card card card-no-hover"{% if post.casting and post.casting.house and post.casting.house.color %} style="border-top: 4px solid {{ post.casting.house.color }}"{% endif %}>
     {% include "player/partials/_post_content.html" %}
 
     {% if post.author == request.user %}
@@ -19,7 +19,7 @@
     {% endif %}
 </div>
 
-<div class="card" style="margin-top: 1.5em;">
+<div class="card card-no-hover" style="margin-top: 1.5em;">
     <h3 class="section-title">Comments</h3>
     <div id="comments-{{ post.pk }}">
         {% include "player/partials/_comment_thread.html" %}
