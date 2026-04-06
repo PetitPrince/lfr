@@ -1,29 +1,59 @@
-<div>
-    <h4 style="margin-bottom:0.3em">
+{% load photo_grid %}
+<div class="post-card" {% if post.post_type == "character" and post.casting and post.casting.house and post.casting.house.color %}style="border-top:3px solid {{ post.casting.house.color }}"{% endif %}>
+
+    {# Role tab #}
+    {% if post.post_type == "character" and post.casting %}
+    <div class="role-tab" style="background:{% if post.casting.house and post.casting.house.color %}{{ post.casting.house.color }}{% else %}var(--brown-mid){% endif %}">
+        {{ post.casting.get_role_display }}
+    </div>
+    {% endif %}
+
+    <div style="margin-top:8px;">
+        {# Character name + badges #}
         {% if post.post_type == "character" and post.casting %}
-            <a href="{% url 'posts:post_detail' slug=run.slug pk=post.pk %}">{{ post.casting.character_name }}</a>
+        <div class="post-name">
+            <a href="{% url 'posts:post_detail' slug=run.slug pk=post.pk %}" style="color:inherit;text-decoration:none;">{{ post.casting.character_name }}</a>
+            {% if post.casting.house %}
+            <span class="house-badge" style="background:{% if post.casting.house.color %}{{ post.casting.house.color }}{% else %}var(--brown-mid){% endif %};{% if post.casting.house.color %}border:1px solid {{ post.casting.house.color }}{% endif %}">{{ post.casting.house }}</span>
+            {% endif %}
+            {% if post.casting.year %}
+            <span class="year-badge" style="border-color:{% if post.casting.year.color %}{{ post.casting.year.color }}{% else %}var(--gold-muted){% endif %}">{{ post.casting.year }}</span>
+            {% endif %}
+        </div>
         {% else %}
-            <a href="{% url 'posts:post_detail' slug=run.slug pk=post.pk %}">{{ post.title }}</a>
+        <div class="post-name">
+            <a href="{% url 'posts:post_detail' slug=run.slug pk=post.pk %}" style="color:inherit;text-decoration:none;">{{ post.title }}</a>
+            <span class="chip">{{ post.get_category_display }}</span>
+        </div>
         {% endif %}
-    </h4>
-    <small class="text-muted">
-        {% if post.post_type == "character" and post.casting %}
-            <span class="badge">{{ post.casting.get_role_display }}</span>
-            {% if post.casting.house %}<span class="badge"{% if post.casting.house.color %} style="background:{{ post.casting.house.color }}; color:#fff"{% endif %}>{{ post.casting.house }}</span>{% endif %}
-            {% if post.casting.year %}<span class="badge"{% if post.casting.year.color %} style="border:2px solid {{ post.casting.year.color }}"{% endif %}>{{ post.casting.year }}</span>{% endif %}
+
+        {# Keywords #}
+        {% for kw in post.keywords.all %}
+        <span class="chip">{{ kw.label }}</span>
+        {% endfor %}
+
+        {# Preview content: rumor if available, else looking-for labels, else truncated bio #}
+        {% if post.rumors.all %}
+        <div class="rumor-preview">{{ post.rumors.first.text }}</div>
+        {% elif post.looking_for_entries.all %}
+        <div style="margin:10px 0 6px;font-size:0.88em;">
+            <span class="font-serif" style="color:var(--gold-dark);font-size:0.9em;">Looking for:</span>
+            {% for lf in post.looking_for_entries.all %}
+            <span class="chip chip-lf">{{ lf.label }}</span>
+            {% endfor %}
+        </div>
         {% else %}
-            <span class="badge">{{ post.get_category_display }}</span>
+        <p style="margin:10px 0 6px;font-size:0.88em;color:var(--ink-light);">{{ post.content|truncatechars:150 }}</p>
         {% endif %}
-        &middot; {{ post.created_at|timesince }} ago
-    </small>
-    <p style="margin:0.5em 0">{{ post.content|truncatechars:150 }}</p>
-    {% for kw in post.keywords.all %}
-    <span class="chip">{{ kw.label }}</span>
-    {% endfor %}
-    <div style="margin-top:0.5em">
-        <button class="outline secondary" style="padding:0.2em 0.8em"
-                hx-get="{% url 'posts:post_expand' slug=run.slug pk=post.pk %}"
-                hx-target="#post-{{ post.pk }}"
-                hx-swap="innerHTML">Read more</button>
+
+        {# Photo tiles #}
+        {% photo_grid post.photos.all "feed" %}
+
+        {# Read more link #}
+        <div style="margin-top:8px;">
+            <a href="{% url 'posts:post_detail' slug=run.slug pk=post.pk %}" class="read-more">
+                Read more{% if post.post_type == "character" and post.casting %} about {{ post.casting.character_name }}{% endif %} &#8594;
+            </a>
+        </div>
     </div>
 </div>

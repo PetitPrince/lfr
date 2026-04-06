@@ -1,85 +1,56 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>LFR — Looking for Relation</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
-    <style>
-        .hero {
-            text-align: center;
-            padding: 8vh 1em 4vh;
-        }
-        .hero h1 {
-            font-size: 2.5em;
-            margin-bottom: 0.2em;
-        }
-        .hero .subtitle {
-            font-size: 1.2em;
-            opacity: 0.7;
-            margin-bottom: 2em;
-        }
-        .hero .actions {
-            display: flex;
-            gap: 1em;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        .steps {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5em;
-            margin: 3em 0;
-        }
-        .steps article {
-            text-align: center;
-        }
-        .steps .step-number {
-            display: inline-block;
-            width: 2em;
-            height: 2em;
-            line-height: 2em;
-            border-radius: 50%;
-            background: var(--pico-primary);
-            color: var(--pico-primary-inverse);
-            font-weight: bold;
-            margin-bottom: 0.5em;
-        }
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/player.css' %}">
 </head>
 <body>
-    <main class="container">
-        <div class="hero">
-            <h1>LFR</h1>
-            <p class="subtitle">Looking for Relation — find your pre-game connections</p>
-            <p>Discover fellow players, share character introductions, and build relationships before the LARP begins.</p>
-            <div class="actions">
-                <a href="{% url 'accounts:login' %}" role="button">Log in</a>
-            </div>
-            <p style="opacity:0.7; font-size:0.9em; margin-top:1em;">Got an invite link? Use it to join your run.</p>
+    <nav class="nav">
+        <a href="#" class="nav-brand">&#10022; Looking for Relation &#10022;</a>
+        <div class="nav-links">
+            <a href="{% url 'accounts:login' %}">Log In</a>
+        </div>
+    </nav>
+
+    <div class="page-container">
+        <div style="text-align: center; padding: 10vh 1em 4vh;">
+            <h1 style="font-size: 2.8em; margin-bottom: 0.3em;">Find Your Place in the Story</h1>
+            <p style="font-size: 1.1em; color: var(--brown-muted); max-width: 50ch; margin: 0 auto 1.5em;">
+                Discover fellow characters, share your introduction, and build relationships before the LARP begins.
+            </p>
+            <div class="divider" style="font-size: 1.2em; letter-spacing: 0.5em; margin: 24px 0;">&#10022; &#10022; &#10022;</div>
         </div>
 
-        <div class="steps">
-            <article>
+        <div class="steps" style="margin-bottom: 48px;">
+            <div class="step">
                 <div class="step-number">1</div>
-                <h4>Get invited</h4>
-                <p>Receive an invite code from your organizer with your casting details.</p>
-            </article>
-            <article>
+                <div class="step-title">Receive Your Invite</div>
+                <div class="step-desc">Your organizer sends a magic link with your casting details pre-filled.</div>
+            </div>
+            <div class="step">
                 <div class="step-number">2</div>
-                <h4>Introduce your character</h4>
-                <p>Post your character's story, keywords, and what relationships you're looking for.</p>
-            </article>
-            <article>
+                <div class="step-title">Introduce Yourself</div>
+                <div class="step-desc">Write your character introduction, add photos, and share what you're looking for.</div>
+            </div>
+            <div class="step">
                 <div class="step-number">3</div>
-                <h4>Find connections</h4>
-                <p>Browse other characters, discover potential friends, rivals, and allies before the game.</p>
-            </article>
+                <div class="step-title">Find Your People</div>
+                <div class="step-desc">Browse, filter, and connect with other characters before the game starts.</div>
+            </div>
         </div>
-    </main>
 
-    <footer class="container">
-        <small style="opacity: 0.6;">LFR — a Witchards community tool</small>
-    </footer>
+        <div style="text-align: center; margin-bottom: 64px;">
+            <a href="{% url 'accounts:login' %}" class="btn-primary" style="font-size: 1.1em; padding: 12px 32px;">Log In</a>
+            <p style="font-size: 0.85em; color: var(--brown-muted); margin-top: 12px;">Registration is by invite only.</p>
+        </div>
+    </div>
+
+    <footer class="site-footer">LFR — a Witchards community tool</footer>
 </body>
 </html>

@@ -1,119 +1,70 @@
+{% load static post_tags theme_tags %}
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}LFR{% endblock %}</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/player.css' %}">
+    {# theme_vars AFTER player.css so per-run overrides win by CSS cascade order #}
+    {% if run %}{% theme_vars run %}{% endif %}
     <script src="https://unpkg.com/htmx.org@2.0.4"></script>
-    <style>
-        .chip {
-            display: inline-block;
-            padding: 0.2em 0.6em;
-            margin: 0.15em;
-            background: var(--pico-muted-border-color);
-            color: var(--pico-color);
-            border-radius: 1em;
-            font-size: 0.85em;
-            text-decoration: none;
-        }
-        .chip-keyword {
-            cursor: pointer;
-        }
-        .chip-keyword:hover {
-            background: var(--pico-secondary);
-            color: var(--pico-secondary-inverse);
-        }
-        .flash-success { color: var(--pico-ins-color); }
-        .flash-error { color: var(--pico-del-color); }
-        .flash-info { color: var(--pico-primary); }
-        .text-error { color: var(--pico-del-color); }
-        .text-muted { opacity: 0.6; }
-        .badge {
-            display: inline-block;
-            padding: 0.15em 0.5em;
-            margin: 0.1em;
-            background: var(--pico-muted-border-color);
-            color: var(--pico-color);
-            border-radius: 0.3em;
-            font-size: 0.8em;
-            text-decoration: none;
-        }
-        a.badge:hover, a.chip:hover {
-            background: var(--pico-secondary);
-            color: var(--pico-secondary-inverse);
-        }
-        .post-preview { border-bottom: 1px solid var(--pico-muted-border-color); padding: 1em 0; }
-        .post-preview:last-child { border-bottom: none; }
-        .faculty-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1em; }
-        .faculty-card { text-align: center; }
-        .faculty-card img { width: 150px; height: 150px; object-fit: cover; border-radius: 50%; }
-        .comment-thread { margin-left: 1.5em; border-left: 2px solid var(--pico-muted-border-color); padding-left: 1em; }
-        .comment { margin: 0.5em 0; }
-        .hallway-widget { background: var(--pico-card-background-color); padding: 1em; border-radius: 0.5em; margin-bottom: 1em; }
-        .filter-sidebar label { margin-bottom: 0.3em; }
-        .looking-for-item { margin-bottom: 0.5em; }
-        nav .brand { font-weight: bold; }
-        .cta-banner { background: var(--pico-card-background-color); padding: 1em; border-radius: 0.5em; margin-bottom: 1em; border: 1px solid var(--pico-muted-border-color); }
-        table { width: 100%; }
-        .photo-gallery { display: flex; flex-wrap: wrap; gap: 0.5em; }
-        .photo-gallery img { max-width: 200px; max-height: 200px; object-fit: cover; border-radius: 0.3em; }
-        .rumor { font-style: italic; padding: 0.3em 0; border-left: 3px solid var(--pico-muted-border-color); padding-left: 0.8em; margin: 0.3em 0; }
-    </style>
     {% block extra_head %}{% endblock %}
 </head>
 <body>
-    <nav class="container-fluid">
-        <ul>
-            <li>
-                {% if run %}
-                <a href="{% url 'posts:message_board' slug=run.slug %}" class="brand">{{ run.name }}</a>
-                {% else %}
-                <a href="{% url 'runs:run_list' %}" class="brand">LFR</a>
-                {% endif %}
-            </li>
-        </ul>
-        <ul>
+    <nav class="nav">
+        <div>
             {% if run %}
-            <li><a href="{% url 'posts:message_board' slug=run.slug %}">Board</a></li>
-            <li><a href="{% url 'posts:discover_faculty' slug=run.slug %}">Faculty</a></li>
-            <li><a href="{% url 'posts:discover_students' slug=run.slug %}">Students</a></li>
-            <li><a href="{% url 'posts:discover_other' slug=run.slug %}">Other</a></li>
+            <a href="{% url 'posts:message_board' slug=run.slug %}" class="nav-brand">&#10022; {{ run.name }} &#10022;</a>
+            {% else %}
+            <a href="{% url 'runs:run_list' %}" class="nav-brand">&#10022; Looking for Relation &#10022;</a>
+            {% endif %}
+        </div>
+        <div class="nav-links">
+            {% if run %}
+            <a href="{% url 'posts:message_board' slug=run.slug %}">Board</a>
+            <span class="nav-sep">&bull;</span>
+            <a href="{% url 'posts:discover_faculty' slug=run.slug %}">Faculty</a>
+            <span class="nav-sep">&bull;</span>
+            <a href="{% url 'posts:discover_students' slug=run.slug %}">Students</a>
+            <span class="nav-sep">&bull;</span>
+            <a href="{% url 'posts:discover_other' slug=run.slug %}">Other</a>
+            <span class="nav-sep">&bull;</span>
             {% endif %}
             {% if user.is_authenticated %}
-            <li><small>{{ user.email }}</small></li>
-            <li><a href="{% url 'accounts:profile' %}" class="outline" style="padding:0.3em 0.8em;margin:0">Profile</a></li>
-            <li>
-                <form method="post" action="{% url 'accounts:logout' %}" style="margin:0">
-                    {% csrf_token %}
-                    <button type="submit" class="outline secondary" style="padding:0.3em 0.8em;margin:0">Logout</button>
-                </form>
-            </li>
+            <a href="{% url 'accounts:profile' %}">Profile</a>
+            <span class="nav-sep">&bull;</span>
+            <form method="post" action="{% url 'accounts:logout' %}" style="display:inline;margin:0;">
+                {% csrf_token %}
+                <button type="submit" class="nav-muted" style="background:none;border:none;cursor:pointer;font-family:'Crimson Pro',serif;font-size:inherit;color:var(--brown-muted);padding:0;">Logout</button>
+            </form>
             {% endif %}
-        </ul>
+        </div>
     </nav>
 
-    {% load post_tags %}
     {% if run %}
-    <div class="container">
+    <div aria-hidden="true">
         {% random_rumor run %}
     </div>
     {% endif %}
 
-    <main class="container">
-        {% if messages %}
-        {% for message in messages %}
-        <article>
-            <p class="flash-{{ message.tags }}">{{ message }}</p>
-        </article>
-        {% endfor %}
-        {% endif %}
+    <main class="page-body">
+        <div class="content-container">
+            {% if messages %}
+            {% for message in messages %}
+            <div class="flash flash-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
 
-        {% block content %}{% endblock %}
+            {% block content %}{% endblock %}
+        </div>
     </main>
 
-    <footer class="container">
-        <small class="text-muted">LFR — Looking for Relation</small>
+    <footer class="site-footer">
+        LFR &mdash; Looking for Relation
     </footer>
 
     {% block extra_scripts %}{% endblock %}

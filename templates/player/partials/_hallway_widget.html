@@ -1,11 +1,26 @@
 {% if posts %}
-<strong>Someone you might meet in the hallways...</strong>
-{% for post in posts %}
-<div style="margin:0.5em 0">
-    <a href="{% url 'posts:post_detail' slug=run.slug pk=post.pk %}">{{ post.casting.character_name }}</a>
-    {% if post.casting.house %}<span class="badge"{% if post.casting.house.color %} style="background:{{ post.casting.house.color }}; color:#fff"{% endif %}>{{ post.casting.house }}</span>{% endif %}
-    {% if post.casting.year %}<span class="badge"{% if post.casting.year.color %} style="border:2px solid {{ post.casting.year.color }}"{% endif %}>{{ post.casting.year }}</span>{% endif %}
-    <br><small>{{ post.content|truncatechars:80 }}</small>
+<div class="hallway-widget">
+    <div class="hallway-title">Someone you might meet in the hallways&hellip;</div>
+    {% for post in posts %}
+    <div class="student-card">
+        <div class="student-thumb">
+            {% if post.photos.all %}
+            <img src="{{ post.photos.first.image.url }}" alt="{{ post.casting.character_name }}">
+            {% else %}
+            <span class="font-serif" style="font-size:1.25em; color:var(--gold-muted);">{{ post.casting.character_name|first }}</span>
+            {% endif %}
+        </div>
+        <div class="student-card-body">
+            <div class="student-card-meta">
+                <h4 class="student-name">
+                    <a href="{% url 'posts:post_detail' slug=run.slug pk=post.pk %}">{{ post.casting.character_name }}</a>
+                </h4>
+                {% if post.casting.house %}<span class="badge badge-house"{% if post.casting.house.color %} style="background:{{ post.casting.house.color }}; color:#fff"{% endif %}>{{ post.casting.house }}</span>{% endif %}
+                {% if post.casting.year %}<span class="badge badge-year"{% if post.casting.year.color %} style="border:2px solid {{ post.casting.year.color }}"{% endif %}>{{ post.casting.year }}</span>{% endif %}
+            </div>
+            <p class="text-muted text-small" style="margin:0;">{{ post.content|truncatechars:80 }}</p>
+        </div>
+    </div>
+    {% endfor %}
 </div>
-{% endfor %}
 {% endif %}

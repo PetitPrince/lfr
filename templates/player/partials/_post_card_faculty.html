@@ -1,17 +1,19 @@
-<article class="faculty-card">
-    {% if post.photos.all %}
-    <img src="{{ post.photos.first.image.url }}" alt="{{ post.casting.character_name }}">
-    {% else %}
-    <div style="width:150px;height:150px;background:var(--pico-secondary-background);border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center">
-        <span style="font-size:2em">{{ post.casting.character_name|first }}</span>
+<article class="faculty-card" style="{% if post.casting.monitor_of_house and post.casting.monitor_of_house.color %}border-top: 4px solid {{ post.casting.monitor_of_house.color }};{% else %}border-top: 4px solid var(--color-gold);{% endif %}">
+    <div class="faculty-portrait">
+        {% if post.photos.all %}
+        <img src="{{ post.photos.first.image.url }}" alt="{{ post.casting.character_name }}">
+        {% else %}
+        <span class="font-serif" style="font-size:2.5em; color:var(--gold-muted);">{{ post.casting.character_name|first }}</span>
+        {% endif %}
     </div>
-    {% endif %}
-    <h4 style="margin:0.5em 0 0.2em">
-        <a href="{% url 'posts:post_detail' slug=run.slug pk=post.pk %}">{{ post.casting.character_name }}</a>
-    </h4>
-    <small>
-        {{ post.casting.get_role_display }}
-        {% if post.casting.teaching_subject %}<br>{{ post.casting.teaching_subject }}{% endif %}
-        {% if post.casting.monitor_of_house %}<br>Monitor of {{ post.casting.monitor_of_house }}{% endif %}
-    </small>
+    <div class="faculty-info">
+        <h4 class="student-name" style="margin:0 0 0.25rem;">
+            <a href="{% url 'posts:post_detail' slug=run.slug pk=post.pk %}">{{ post.casting.character_name }}</a>
+        </h4>
+        <small class="text-muted">
+            {{ post.casting.get_role_display }}
+            {% if post.casting.teaching_subject %}<br>{{ post.casting.teaching_subject }}{% endif %}
+            {% if post.casting.monitor_of_house %}<br>Monitor of {{ post.casting.monitor_of_house }}{% endif %}
+        </small>
+    </div>
 </article>

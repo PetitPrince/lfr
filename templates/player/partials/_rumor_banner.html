@@ -1,6 +1,6 @@
 {% if rumor %}
-<div class="rumor-banner" style="text-align:center; padding:0.6em 1em; font-style:italic; opacity:0.75; font-size:0.9em;">
-    <span>"{{ rumor.text }}"</span>
+<div class="rumor-banner">
+    <span>&ldquo;{{ rumor.text }}&rdquo;</span>
     {% if rumor.post.casting %}
     <span> &mdash; about <a href="{% url 'posts:post_detail' slug=run.slug pk=rumor.post.pk %}">{{ rumor.post.casting.character_name }}</a></span>
     {% endif %}

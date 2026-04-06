@@ -31,3 +31,8 @@ Thumbs.db
 .env
 *.env.local
 config/local_settings.py
+
+.superpowers
+.claude
+
+example

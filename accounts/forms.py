@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth import get_user_model
+from django.contrib.auth.password_validation import validate_password
 
 User = get_user_model()
 
@@ -17,6 +18,12 @@ class JoinSignupForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ["email"]
+
+    def clean_password(self):
+        p1 = self.cleaned_data.get("password")
+        if p1:
+            validate_password(p1)
+        return p1
 
     def clean_password_confirm(self):
         p1 = self.cleaned_data.get("password")

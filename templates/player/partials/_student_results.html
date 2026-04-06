@@ -1,21 +1,36 @@
+{% if posts %}
+<p class="text-muted text-small" style="margin-bottom:1rem;">{{ posts|length }} student{{ posts|length|pluralize }} found</p>
+{% endif %}
 {% for post in posts %}
-<div class="post-preview">
-    <h4 style="margin-bottom:0.3em">
-        <a href="{% url 'posts:post_detail' slug=run.slug pk=post.pk %}">{{ post.casting.character_name }}</a>
-    </h4>
-    <small class="text-muted">
-        {% if post.casting.house %}<span class="badge"{% if post.casting.house.color %} style="background:{{ post.casting.house.color }}; color:#fff"{% endif %}>{{ post.casting.house }}</span>{% endif %}
-        {% if post.casting.year %}<span class="badge"{% if post.casting.year.color %} style="border:2px solid {{ post.casting.year.color }}"{% endif %}>{{ post.casting.year }}</span>{% endif %}
-        {% if post.casting.path %}<span class="badge">{{ post.casting.path }}</span>{% endif %}
-        {% if post.casting.blood_status %}<span class="badge">{{ post.casting.blood_status }}</span>{% endif %}
-    </small>
-    <p style="margin:0.5em 0">{{ post.content|truncatechars:150 }}</p>
-    {% for kw in post.keywords.all %}
-    <span class="chip chip-keyword"
-          hx-get="{% url 'posts:student_filter' slug=run.slug %}?keyword={{ kw.label|urlencode }}"
-          hx-target="#student-results"
-          hx-swap="innerHTML">{{ kw.label }}</span>
-    {% endfor %}
+<div class="student-card">
+    <div class="student-thumb">
+        {% if post.photos.all %}
+        <img src="{{ post.photos.first.image.url }}" alt="{{ post.casting.character_name }}">
+        {% else %}
+        <span class="font-serif" style="font-size:1.25em; color:var(--gold-muted);">{{ post.casting.character_name|first }}</span>
+        {% endif %}
+    </div>
+    <div class="student-card-body">
+        <div class="student-card-meta">
+            <h4 class="student-name">
+                <a href="{% url 'posts:post_detail' slug=run.slug pk=post.pk %}">{{ post.casting.character_name }}</a>
+            </h4>
+            {% if post.casting.house %}<span class="badge badge-house"{% if post.casting.house.color %} style="background:{{ post.casting.house.color }}; color:#fff"{% endif %}>{{ post.casting.house }}</span>{% endif %}
+            {% if post.casting.year %}<span class="badge badge-year"{% if post.casting.year.color %} style="border:2px solid {{ post.casting.year.color }}"{% endif %}>{{ post.casting.year }}</span>{% endif %}
+            {% if post.casting.path %}<span class="badge">{{ post.casting.path }}</span>{% endif %}
+            {% if post.casting.blood_status %}<span class="badge">{{ post.casting.blood_status }}</span>{% endif %}
+        </div>
+        <p class="text-muted text-small" style="margin:0.25rem 0;">{{ post.content|truncatechars:150 }}</p>
+        <div class="chip-row">
+            {% for kw in post.keywords.all %}
+            <span class="chip chip-keyword"
+                  hx-get="{% url 'posts:student_filter' slug=run.slug %}?keyword={{ kw.label|urlencode }}"
+                  hx-target="#student-results"
+                  hx-swap="innerHTML">{{ kw.label }}</span>
+            {% endfor %}
+        </div>
+        <a class="read-more" href="{% url 'posts:post_detail' slug=run.slug pk=post.pk %}">Read more &rarr;</a>
+    </div>
 </div>
 {% empty %}
 <p class="text-muted">No students match your filters.</p>
