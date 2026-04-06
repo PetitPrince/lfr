@@ -3,22 +3,26 @@
 {% block title %}{% if post.post_type == "character" and post.casting %}{{ post.casting.character_name }}{% else %}{{ post.title }}{% endif %} — {{ run.name }}{% endblock %}
 
 {% block content %}
-<article>
+<a href="javascript:history.back()" class="back-link">&larr; Back</a>
+
+<div class="detail-card card{% if post.casting and post.casting.house and post.casting.house.color %}" style="border-top: 4px solid {{ post.casting.house.color }}{% endif %}">
     {% include "player/partials/_post_content.html" %}
 
     {% if post.author == request.user %}
-    <div style="margin-top:1em">
-        <a href="{% url 'posts:post_edit' slug=run.slug pk=post.pk %}" role="button" class="outline">Edit</a>
+    <div style="margin-top: 1.5em; display: flex; gap: 0.5em; flex-wrap: wrap;">
+        <a href="{% url 'posts:post_edit' slug=run.slug pk=post.pk %}" class="btn-outline">Edit</a>
         <form method="post" action="{% url 'posts:post_delete' slug=run.slug pk=post.pk %}" style="display:inline">
             {% csrf_token %}
-            <button type="submit" class="outline secondary" onclick="return confirm('Delete this post?')">Delete</button>
+            <button type="submit" class="btn-danger" onclick="return confirm('Delete this post?')">Delete</button>
         </form>
     </div>
     {% endif %}
-</article>
+</div>
 
-<h3>Comments</h3>
-<div id="comments-{{ post.pk }}">
-    {% include "player/partials/_comment_thread.html" %}
+<div class="card" style="margin-top: 1.5em;">
+    <h3 class="section-title">Comments</h3>
+    <div id="comments-{{ post.pk }}">
+        {% include "player/partials/_comment_thread.html" %}
+    </div>
 </div>
 {% endblock %}

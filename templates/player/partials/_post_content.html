@@ -1,87 +1,106 @@
 {% load markdown_filter %}
-<h4 style="margin-bottom:0.3em">
-    {% if post.post_type == "character" and post.casting %}
-        {{ post.casting.character_name }}
-    {% else %}
-        {{ post.title }}
-    {% endif %}
-</h4>
+{% load photo_grid %}
 
-<small class="text-muted">
-    {% if post.post_type == "character" and post.casting %}
-        <span class="badge">{{ post.casting.get_role_display }}</span>
-        {% if post.casting.house %}<a href="{% url 'posts:discover_students' slug=run.slug %}?house={{ post.casting.house.pk }}" class="badge"{% if post.casting.house.color %} style="background:{{ post.casting.house.color }}; color:#fff"{% endif %}>{{ post.casting.house }}</a>{% endif %}
-        {% if post.casting.year %}<a href="{% url 'posts:discover_students' slug=run.slug %}?year={{ post.casting.year.pk }}" class="badge"{% if post.casting.year.color %} style="border:2px solid {{ post.casting.year.color }}"{% endif %}>{{ post.casting.year }}</a>{% endif %}
-        {% if post.casting.path %}<a href="{% url 'posts:discover_students' slug=run.slug %}?path={{ post.casting.path.pk }}" class="badge">{{ post.casting.path }}</a>{% endif %}
-        {% if post.casting.blood_status %}<a href="{% url 'posts:discover_students' slug=run.slug %}?blood_status={{ post.casting.blood_status.pk }}" class="badge">{{ post.casting.blood_status }}</a>{% endif %}
-        {% if post.casting.teaching_subject %}<span class="badge">Teaching: {{ post.casting.teaching_subject }}</span>{% endif %}
-        {% if post.casting.monitor_of_house %}<span class="badge">Monitor of {{ post.casting.monitor_of_house }}</span>{% endif %}
-        {% if post.casting.monitor_of_club %}<span class="badge">Monitor of {{ post.casting.monitor_of_club }}</span>{% endif %}
-        {% if post.casting.staff_title %}<span class="badge">{{ post.casting.staff_title }}</span>{% endif %}
-    {% else %}
-        <a href="{% url 'posts:discover_other' slug=run.slug %}?category={{ post.category }}" class="badge">{{ post.get_category_display }}</a>
-        {% if post.club %}<a href="{% url 'posts:discover_students' slug=run.slug %}?club={{ post.club.pk }}" class="badge">{{ post.club }}</a>{% endif %}
-    {% endif %}
-    &middot; {{ post.created_at|timesince }} ago
-    {% if post.author == request.user %}
-    &middot; <a href="{% url 'posts:post_edit' slug=run.slug pk=post.pk %}">Edit</a>
-    {% endif %}
-</small>
+<div class="char-header">
+    <div class="char-portrait">
+        {% with first_photo=post.photos.all|first %}
+        {% if first_photo %}
+        <img src="{{ first_photo.image.url }}" alt="{{ first_photo.caption }}">
+        {% else %}
+        <img src="/static/img/portrait-placeholder.svg" alt="No portrait">
+        {% endif %}
+        {% endwith %}
+    </div>
+    <div>
+        <h2 style="margin: 0 0 0.3em;">
+            {% if post.post_type == "character" and post.casting %}
+                {{ post.casting.character_name }}
+            {% else %}
+                {{ post.title }}
+            {% endif %}
+        </h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 0.3em; align-items: center;">
+            {% if post.post_type == "character" and post.casting %}
+                <span class="badge">{{ post.casting.get_role_display }}</span>
+                {% if post.casting.house %}<a href="{% url 'posts:discover_students' slug=run.slug %}?house={{ post.casting.house.pk }}" class="badge badge-house"{% if post.casting.house.color %} style="background:{{ post.casting.house.color }}; color:#fff"{% endif %}>{{ post.casting.house }}</a>{% endif %}
+                {% if post.casting.year %}<a href="{% url 'posts:discover_students' slug=run.slug %}?year={{ post.casting.year.pk }}" class="badge badge-year"{% if post.casting.year.color %} style="border:2px solid {{ post.casting.year.color }}"{% endif %}>{{ post.casting.year }}</a>{% endif %}
+                {% if post.casting.path %}<a href="{% url 'posts:discover_students' slug=run.slug %}?path={{ post.casting.path.pk }}" class="badge">{{ post.casting.path }}</a>{% endif %}
+                {% if post.casting.blood_status %}<a href="{% url 'posts:discover_students' slug=run.slug %}?blood_status={{ post.casting.blood_status.pk }}" class="badge">{{ post.casting.blood_status }}</a>{% endif %}
+                {% if post.casting.teaching_subject %}<span class="badge">Teaching: {{ post.casting.teaching_subject }}</span>{% endif %}
+                {% if post.casting.monitor_of_house %}<span class="badge">Monitor of {{ post.casting.monitor_of_house }}</span>{% endif %}
+                {% if post.casting.monitor_of_club %}<span class="badge">Monitor of {{ post.casting.monitor_of_club }}</span>{% endif %}
+                {% if post.casting.staff_title %}<span class="badge">{{ post.casting.staff_title }}</span>{% endif %}
+            {% else %}
+                <a href="{% url 'posts:discover_other' slug=run.slug %}?category={{ post.category }}" class="badge">{{ post.get_category_display }}</a>
+                {% if post.club %}<a href="{% url 'posts:discover_students' slug=run.slug %}?club={{ post.club.pk }}" class="badge">{{ post.club }}</a>{% endif %}
+            {% endif %}
+        </div>
+        <div class="text-muted" style="font-size: 0.85em; margin-top: 0.4em;">
+            {{ post.created_at|timesince }} ago
+        </div>
+        {% if post.casting.clubs.all %}
+        <div style="margin-top: 0.4em; display: flex; flex-wrap: wrap; gap: 0.3em; align-items: center;">
+            <small class="text-muted">Clubs:</small>
+            {% for club in post.casting.clubs.all %}
+            <a href="{% url 'posts:discover_students' slug=run.slug %}?club={{ club.pk }}" class="chip">{{ club }}</a>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% if post.keywords.all %}
+        <div style="margin-top: 0.4em; display: flex; flex-wrap: wrap; gap: 0.3em;">
+            {% for kw in post.keywords.all %}
+            <a href="{% url 'posts:discover_students' slug=run.slug %}?keyword={{ kw.label|urlencode }}" class="chip chip-keyword">{{ kw.label }}</a>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
 
-{% if post.casting.clubs.all %}
-<div style="margin-top:0.3em">
-    <small>Clubs:</small>
-    {% for club in post.casting.clubs.all %}
-    <a href="{% url 'posts:discover_students' slug=run.slug %}?club={{ club.pk }}" class="chip">{{ club }}</a>
-    {% endfor %}
+{% if post.photos.all %}
+<div class="photo-grid-detail">
+    {% photo_grid post.photos.all "detail" %}
 </div>
 {% endif %}
 
-{% if post.keywords.all %}
-<div style="margin:0.5em 0">
-    {% for kw in post.keywords.all %}
-    <a href="{% url 'posts:discover_students' slug=run.slug %}?keyword={{ kw.label|urlencode }}" class="chip chip-keyword">{{ kw.label }}</a>
-    {% endfor %}
-</div>
-{% endif %}
+<div class="divider" aria-hidden="true"></div>
 
-<div style="margin:0.8em 0">{{ post.content|markdown }}</div>
+<h3 class="section-title">About {% if post.post_type == "character" and post.casting %}{{ post.casting.character_name }}{% else %}{{ post.title }}{% endif %}</h3>
+<div class="description">{{ post.content|markdown }}</div>
 
 {% if post.looking_for_entries.all %}
-<div style="margin:0.5em 0">
-    <strong>Looking for:</strong>
-    {% for lf in post.looking_for_entries.all %}
-    <div class="looking-for-item">
-        <strong>{{ lf.label }}</strong>{% if lf.description %} — {{ lf.description }}{% endif %}
-    </div>
-    {% endfor %}
+<div class="divider" aria-hidden="true"></div>
+<h3 class="section-title">Looking For</h3>
+{% for lf in post.looking_for_entries.all %}
+<div class="lf-item">
+    <div class="lf-label">{{ lf.label }}</div>
+    {% if lf.description %}<div class="lf-desc">{{ lf.description }}</div>{% endif %}
 </div>
+{% endfor %}
 {% endif %}
 
 {% if post.rumors.all %}
-<div style="margin:0.5em 0">
-    <strong>Rumors, Gossips and what people say about {{ post.casting.character_name }}:</strong>
-    {% for rumor in post.rumors.all %}
-    <div class="rumor">{{ rumor.text }}</div>
-    {% endfor %}
-</div>
+<div class="divider" aria-hidden="true"></div>
+<h3 class="section-title">What People Say</h3>
+{% for rumor in post.rumors.all %}
+<div class="rumor-detail">{{ rumor.text }}</div>
+{% endfor %}
 {% endif %}
 
 {% if post.author.contact_email or post.author.discord_username or post.author.facebook_url or post.author.instagram_url %}
-<div class="contact-links" style="margin:0.5em 0">
-    <small class="text-muted">
-        {% if post.author.contact_email %}&#x2709; <a href="mailto:{{ post.author.contact_email }}">{{ post.author.contact_email }}</a>{% endif %}
-        {% if post.author.discord_username %}{% if post.author.contact_email %} &middot; {% endif %}Discord: {{ post.author.discord_username }}{% endif %}
-        {% if post.author.facebook_url %}{% if post.author.contact_email or post.author.discord_username %} &middot; {% endif %}<a href="{{ post.author.facebook_url }}">Facebook</a>{% endif %}
-        {% if post.author.instagram_url %}{% if post.author.contact_email or post.author.discord_username or post.author.facebook_url %} &middot; {% endif %}<a href="{{ post.author.instagram_url }}">Instagram</a>{% endif %}
-    </small>
-</div>
-{% endif %}
-
-{% if post.photos.all %}
-<div class="photo-gallery" style="margin:0.5em 0">
-    {% for photo in post.photos.all %}
-    <img src="{{ photo.image.url }}" alt="{{ photo.caption }}" title="{{ photo.caption }}">
-    {% endfor %}
+<div class="divider" aria-hidden="true"></div>
+<h3 class="section-title">Contact</h3>
+<div class="contact-row">
+    {% if post.author.contact_email %}
+    <span class="contact-item">&#x2709; <a href="mailto:{{ post.author.contact_email }}">{{ post.author.contact_email }}</a></span>
+    {% endif %}
+    {% if post.author.discord_username %}
+    <span class="contact-item">Discord: {{ post.author.discord_username }}</span>
+    {% endif %}
+    {% if post.author.facebook_url %}
+    <span class="contact-item"><a href="{{ post.author.facebook_url }}">Facebook</a></span>
+    {% endif %}
+    {% if post.author.instagram_url %}
+    <span class="contact-item"><a href="{{ post.author.instagram_url }}">Instagram</a></span>
+    {% endif %}
 </div>
 {% endif %}
